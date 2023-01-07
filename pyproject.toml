@@ -1,0 +1,87 @@
+[project]
+name = "data-platform"
+version = "0.1.0"
+requires-python = ">3.7"
+readme = "README.md"
+authors = [
+  {name = "Data Team", email = "data@team.com"}
+]
+
+dependencies = [
+    "black",
+    "mypy",
+    "phidata>=0.4.10",
+    "pre-commit",
+    "pytest",
+    "requests",
+    "ruff",
+    "duckdb",
+    "sqlmodel",
+]
+
+[project.optional-dependencies]
+pg = [
+    "psycopg2-binary",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["workflows", "workspace", "notebooks"]
+
+# Exclude secrets from the package
+# https://setuptools.pypa.io/en/latest/userguide/datafiles.html#exclude-package-data
+[tool.setuptools.exclude-package-data]
+workspace = ["secrets"]
+
+# Update this value if the workspace directory is renamed.
+# [tool.phidata]
+# workspace = "workspace"
+
+[tool.ruff]
+line-length = 110
+# Ignore `F401` (unused imports).
+ignore = ["F401"]
+exclude = [
+    "dpenv*",
+    "dpenvdev*",
+    "workspace/dev/airflow/resources/*",
+    "workspace/prd/airflow/resources/*",
+    "workspace/dev/superset/resources/*",
+    "workspace/prd/superset/resources/*",
+    "workspace/dev/jupyter/resources/*",
+    "workspace/prd/jupyter/resources/*",
+]
+
+[tool.mypy]
+pretty = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_unused_configs = true
+exclude = [
+    "dpenv*",
+    "dpenvdev*",
+    "workspace/dev/airflow/resources/*",
+    "workspace/prd/airflow/resources/*",
+    "workspace/dev/superset/resources/*",
+    "workspace/prd/superset/resources/*",
+    "workspace/dev/jupyter/resources/*",
+    "workspace/prd/jupyter/resources/*",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "airflow",
+    "airflow.*",
+    "phidata",
+    "phidata.*",
+    "pandas.*",
+    "setuptools",
+    "setuptools.*",
+    "sqlalchemy",
+    "sqlalchemy.*",
+    "requests",
+]
+ignore_missing_imports = true
