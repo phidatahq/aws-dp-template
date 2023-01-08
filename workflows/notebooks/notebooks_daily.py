@@ -17,8 +17,7 @@ default_task_args = {
     "retries": 1,
 }
 
-notebooks_daily_dir = Path(__file__).parent
-workflows_dir = notebooks_daily_dir.parent
+workflows_dir = Path(__file__).parent.parent
 notebooks_dir = workflows_dir.parent.joinpath("notebooks")
 
 with DAG(
@@ -29,16 +28,9 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    test_nb = PapermillOperator(
-        task_id="test_nb",
-        input_nb=str(notebooks_dir.joinpath("examples", "test_nb.ipynb")),
-        output_nb="/tmp/test_nb_{{ execution_date }}.ipynb",
-        parameters={"msg": "Ran from Airflow at {{ execution_date }}!"},
-    )
-
-    snowflake_nb = PapermillOperator(
-        task_id="snowflake_nb",
-        input_nb=str(notebooks_dir.joinpath("examples", "snowflake_nb.ipynb")),
-        output_nb="/tmp/snowflake_nb_{{ execution_date }}.ipynb",
+    hello_world = PapermillOperator(
+        task_id="hello_world",
+        input_nb=str(notebooks_dir.joinpath("examples", "hello_world.ipynb")),
+        output_nb="/tmp/hello_world_{{ execution_date }}.ipynb",
         parameters={"msg": "Ran from Airflow at {{ execution_date }}!"},
     )

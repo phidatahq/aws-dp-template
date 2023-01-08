@@ -4,7 +4,7 @@ from workflows.env import AIRFLOW_ENV
 from workspace.dev.aws_resources import dev_data_s3_bucket, dev_logs_s3_bucket
 from workspace.prd.aws_resources import prd_data_s3_bucket, prd_logs_s3_bucket
 
-# -*- S3 Buckets -*-
+# -*- S3 Buckets
 
 # S3 bucket for storing data
 DATA_S3_BUCKET: S3Bucket

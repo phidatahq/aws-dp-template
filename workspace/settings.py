@@ -44,10 +44,12 @@ ws_settings = WorkspaceSettings(
     # Security Groups for AWS resources
     security_groups=None,
     # -*- Image Settings
-    # Build images locally
-    build_images=False,
     # Repository for images
     image_repo="phidata",
     # Suffix added to the image name
     image_suffix="dp",
+    # Build images locally
+    build_images=True,
+    # Push images after building
+    push_docker_images=True,
 )

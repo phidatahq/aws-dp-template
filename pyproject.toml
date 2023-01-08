@@ -8,12 +8,14 @@ authors = [
 ]
 
 dependencies = [
-  "black[jupyter]",
+  "black",
   "mypy",
   "phidata==1.0.0.dev1",
   "pre-commit",
   "pytest",
   "ruff",
+  # For Airflow 2.5.0 compatibility
+  "pathspec~=0.9.0",
 ]
 
 [build-system]
