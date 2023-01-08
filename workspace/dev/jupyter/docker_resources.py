@@ -16,9 +16,9 @@ dev_jupyter = JupyterLab(
     # The jupyter_lab_config is mounted when creating the image
     jupyter_config_file="/usr/local/jupyter/jupyter_lab_config.py",
     # Read env variables from env/dev_jupyter_env.yml
-    env_file=ws_settings.ws_dir_path.joinpath("env/dev_jupyter_env.yml"),
+    env_file=ws_settings.ws_dir.joinpath("env/dev_jupyter_env.yml"),
     # Read secrets from secrets/dev_jupyter_secrets.yml
-    secrets_file=ws_settings.ws_dir_path.joinpath("secrets/dev_jupyter_secrets.yml"),
+    secrets_file=ws_settings.ws_dir.joinpath("secrets/dev_jupyter_secrets.yml"),
     use_cache=ws_settings.use_cache,
     # Run the notebook server on jupyter.dp
     container_labels={

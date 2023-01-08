@@ -34,7 +34,7 @@ prd_postgres_volume = EbsVolume(
 
 prd_postgres_aws_resources = AwsResourceGroup(
     name=f"postgres-{db_id}",
-    enabled=ws_settings.pg_dbs_enabled,
+    enabled=ws_settings.prd_postgres_enabled,
     volumes=[prd_postgres_volume],
 )
 
@@ -46,7 +46,7 @@ prd_postgres = PostgresDb(
     name=f"postgres-{db_id}",
     volume_type=PostgresVolumeType.AWS_EBS,
     ebs_volume=prd_postgres_volume,
-    secrets_file=ws_settings.ws_dir_path.joinpath("secrets/prd_postgres_secrets.yml"),
+    secrets_file=ws_settings.ws_dir.joinpath("secrets/prd_postgres_secrets.yml"),
     pod_node_selector=services_ng_label,
 )
 

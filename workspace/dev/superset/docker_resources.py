@@ -38,11 +38,11 @@ wait_for_redis: bool = True
 mount_resources: bool = True
 dev_superset_resources: str = "workspace/dev/superset/resources"
 # Read env variables from env/dev_superset_env.yml
-dev_superset_env_file: Path = ws_settings.ws_dir_path.joinpath(
+dev_superset_env_file: Path = ws_settings.ws_dir.joinpath(
     "env/dev_superset_env.yml"
 )
 # Read secrets from secrets/dev_superset_secrets.yml
-dev_superset_secrets_file: Path = ws_settings.ws_dir_path.joinpath(
+dev_superset_secrets_file: Path = ws_settings.ws_dir.joinpath(
     "secrets/dev_superset_secrets.yml"
 )
 

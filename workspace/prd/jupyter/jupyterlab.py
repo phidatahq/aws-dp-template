@@ -40,7 +40,7 @@ prd_jupyter_ebs_volume = EbsVolume(
 
 prd_jupyterlab_aws_resources = AwsResourceGroup(
     name=f"jupyterlab-{lab_id}",
-    enabled=ws_settings.jupyter_enabled,
+    enabled=ws_settings.prd_jupyter_enabled,
     volumes=[prd_jupyter_ebs_volume],
 )
 
@@ -57,9 +57,9 @@ prd_jupyterlab = JupyterLab(
     # The jupyter_lab_config is mounted when creating the image
     jupyter_config_file="/usr/local/jupyter/jupyter_lab_config.py",
     # Read env variables from env/prd_jupyter_env.yml
-    env_file=ws_settings.ws_dir_path.joinpath("env/prd_jupyter_env.yml"),
+    env_file=ws_settings.ws_dir.joinpath("env/prd_jupyter_env.yml"),
     # Read secrets from secrets/prd_jupyter_secrets.yml
-    secrets_file=ws_settings.ws_dir_path.joinpath("secrets/prd_jupyter_secrets.yml"),
+    secrets_file=ws_settings.ws_dir.joinpath("secrets/prd_jupyter_secrets.yml"),
     image_pull_policy=ImagePullPolicy.ALWAYS,
     use_cache=ws_settings.use_cache,
     pod_node_selector=workers_ng_label,

@@ -90,11 +90,11 @@ prd_superset_rds_db = DbInstance(
     # NOTE: For production, use a larger instance type.
     # Last checked price: $0.152 per hour = ~$110 per month
     db_instance_class="db.m6g.large",
-    availability_zone=ws_settings.aws_az_1,
+    availability_zone=ws_settings.aws_az1,
     db_subnet_group=prd_rds_subnet_group,
     enable_performance_insights=True,
     vpc_security_group_ids=ws_settings.security_groups,
-    secrets_file=ws_settings.ws_dir_path.joinpath(
+    secrets_file=ws_settings.ws_dir.joinpath(
         "secrets/prd_superset_db_secrets.yml"
     ),
     skip_create=skip_create,
@@ -114,7 +114,7 @@ prd_superset_redis_cluster = CacheCluster(
     cache_node_type="cache.t2.medium",
     security_group_ids=ws_settings.security_groups,
     cache_subnet_group=prd_elasticache_subnet_group,
-    preferred_availability_zone=ws_settings.aws_az_1,
+    preferred_availability_zone=ws_settings.aws_az1,
     skip_create=skip_create,
     skip_delete=skip_delete,
     wait_for_creation=wait_for_create,

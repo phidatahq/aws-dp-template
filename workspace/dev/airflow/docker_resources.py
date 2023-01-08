@@ -41,9 +41,9 @@ executor: str = "CeleryExecutor"
 # Mount the ws_repo using a docker volume
 mount_workspace: bool = True
 # Read env variables from env/dev_airflow_env.yml
-dev_airflow_env_file: Path = ws_settings.ws_dir_path.joinpath("env/dev_airflow_env.yml")
+dev_airflow_env_file: Path = ws_settings.ws_dir.joinpath("env/dev_airflow_env.yml")
 # Read secrets from secrets/dev_airflow_secrets.yml
-dev_airflow_secrets_file: Path = ws_settings.ws_dir_path.joinpath(
+dev_airflow_secrets_file: Path = ws_settings.ws_dir.joinpath(
     "secrets/dev_airflow_secrets.yml"
 )
 # Add airflow configuration using env variables
