@@ -8,15 +8,12 @@ authors = [
 ]
 
 dependencies = [
-    "black",
-    "httpx",
-    "mypy",
-    "phidata>=0.4.10",
-    "polars",
-    "pre-commit",
-    "pytest",
-    "ruff",
-    "sqlmodel",
+  "black[jupyter]",
+  "mypy",
+  "phidata==1.0.0.dev1",
+  "pre-commit",
+  "pytest",
+  "ruff",
 ]
 
 [build-system]
@@ -40,14 +37,14 @@ line-length = 110
 # Ignore `F401` (unused imports).
 ignore = ["F401"]
 exclude = [
-    "dpenv*",
-    "dpenvdev*",
-    "workspace/dev/airflow/resources/*",
-    "workspace/prd/airflow/resources/*",
-    "workspace/dev/superset/resources/*",
-    "workspace/prd/superset/resources/*",
-    "workspace/dev/jupyter/resources/*",
-    "workspace/prd/jupyter/resources/*",
+  "dpenv*",
+  "dpenvdev*",
+  "workspace/dev/airflow/resources/*",
+  "workspace/prd/airflow/resources/*",
+  "workspace/dev/superset/resources/*",
+  "workspace/prd/superset/resources/*",
+  "workspace/dev/jupyter/resources/*",
+  "workspace/prd/jupyter/resources/*",
 ]
 
 [tool.mypy]
@@ -56,27 +53,23 @@ check_untyped_defs = true
 no_implicit_optional = true
 warn_unused_configs = true
 exclude = [
-    "dpenv*",
-    "dpenvdev*",
-    "workspace/dev/airflow/resources/*",
-    "workspace/prd/airflow/resources/*",
-    "workspace/dev/superset/resources/*",
-    "workspace/prd/superset/resources/*",
-    "workspace/dev/jupyter/resources/*",
-    "workspace/prd/jupyter/resources/*",
+  "dpenv*",
+  "dpenvdev*",
+  "workspace/dev/airflow/resources/*",
+  "workspace/prd/airflow/resources/*",
+  "workspace/dev/superset/resources/*",
+  "workspace/prd/superset/resources/*",
+  "workspace/dev/jupyter/resources/*",
+  "workspace/prd/jupyter/resources/*",
 ]
 
 [[tool.mypy.overrides]]
 module = [
-    "airflow",
-    "airflow.*",
-    "phidata",
-    "phidata.*",
-    "pandas.*",
-    "setuptools",
-    "setuptools.*",
-    "sqlalchemy",
-    "sqlalchemy.*",
-    "requests",
+  "airflow",
+  "airflow.*",
+  "phidata",
+  "phidata.*",
+  "setuptools",
+  "setuptools.*",
 ]
 ignore_missing_imports = true

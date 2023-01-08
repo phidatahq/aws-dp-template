@@ -7,16 +7,8 @@ from phidata.infra.aws.resource.group import (
     AwsResourceGroup,
     S3Bucket,
 )
-from typing_extensions import Literal
 
-from workspace.settings import (
-    prd_domain,
-    prd_key,
-    prd_tags,
-    subnet_ids,
-    security_groups,
-    ws_dir_path,
-)
+from workspace.settings import ws_settings
 
 #
 # -*- AWS resources
@@ -35,7 +27,7 @@ wait_for_delete: bool = False
 # -*- S3 buckets
 # S3 bucket for storing logs
 prd_logs_s3_bucket = S3Bucket(
-    name=f"{prd_key}-logs",
+    name=f"{ws_settings.prd_key}-logs",
     acl="private",
     skip_create=skip_create,
     skip_delete=skip_delete,
@@ -44,7 +36,7 @@ prd_logs_s3_bucket = S3Bucket(
 )
 # S3 bucket for storing data
 prd_data_s3_bucket = S3Bucket(
-    name=f"{prd_key}-data",
+    name=f"{ws_settings.prd_key}-data",
     acl="private",
     skip_create=skip_create,
     skip_delete=skip_delete,
@@ -54,9 +46,9 @@ prd_data_s3_bucket = S3Bucket(
 
 # -*- VPC stack for EKS
 prd_vpc_stack = CloudFormationStack(
-    name=f"{prd_key}-vpc",
+    name=f"{ws_settings.prd_key}-vpc",
     template_url="https://amazon-eks.s3.us-west-2.amazonaws.com/cloudformation/2020-10-29/amazon-eks-vpc-private-subnets.yaml",
-    tags=prd_tags,
+    tags=ws_settings.prd_tags,
     skip_create=skip_create,
     skip_delete=skip_delete,
     wait_for_creation=wait_for_create,
@@ -65,33 +57,26 @@ prd_vpc_stack = CloudFormationStack(
 
 # -*- EKS settings
 # Node Group label for Services
-services_ng_label = {
-    "app_type": "service",
-}
+services_ng_label = {"app_type": "service"}
 # Node Group label for Workers
-workers_ng_label = {
-    "app_type": "worker",
-}
+workers_ng_label = {"app_type": "worker"}
 # How to distribute pods across EKS nodes
 # "kubernetes.io/hostname" means spread across nodes
 topology_spread_key: str = "kubernetes.io/hostname"
 topology_spread_max_skew: int = 2
-topology_spread_when_unsatisfiable: Literal[
-    "DoNotSchedule", "ScheduleAnyway"
-] = "DoNotSchedule"
+topology_spread_when_unsatisfiable: str = "DoNotSchedule"
 
 # -*- EKS cluster
 prd_eks_cluster = EksCluster(
-    name=f"{prd_key}-cluster",
-    # Add subnets and security groups.
-    resources_vpc_config={
-        "subnetIds": subnet_ids,
-        "securityGroupIds": security_groups,
-    },
-    # To use the prd_vpc_stack from above,
-    # uncomment the line below and comment out the resources_vpc_config above
-    # vpc_stack=prd_vpc_stack,
-    tags=prd_tags,
+    name=f"{ws_settings.prd_key}-cluster",
+    vpc_stack=prd_vpc_stack,
+    # To use custom subnets and security groups.
+    # Uncomment the line below and comment out the vpc_stack line below
+    # resources_vpc_config={
+    #     "subnetIds": ws_settings.subnet_ids,
+    #     "securityGroupIds": ws_settings.security_groups,
+    # },
+    tags=ws_settings.prd_tags,
     # Manage kubeconfig separately using an EksKubeconfig resource
     manage_kubeconfig=False,
     skip_create=skip_create,
@@ -105,7 +90,7 @@ prd_eks_kubeconfig = EksKubeconfig(eks_cluster=prd_eks_cluster)
 
 # -*- EKS cluster nodegroup for running core services
 prd_services_eks_nodegroup = EksNodeGroup(
-    name=f"{prd_key}-services-ng",
+    name=f"{ws_settings.prd_key}-services-ng",
     min_size=2,
     max_size=5,
     desired_size=2,
@@ -114,7 +99,7 @@ prd_services_eks_nodegroup = EksNodeGroup(
     eks_cluster=prd_eks_cluster,
     # Add the services label to the nodegroup
     labels=services_ng_label,
-    tags=prd_tags,
+    tags=ws_settings.prd_tags,
     skip_create=skip_create,
     skip_delete=skip_delete,
     wait_for_creation=wait_for_create,
@@ -123,7 +108,7 @@ prd_services_eks_nodegroup = EksNodeGroup(
 
 # -*- EKS cluster nodegroup for running worker services
 prd_worker_eks_nodegroup = EksNodeGroup(
-    name=f"{prd_key}-workers-ng",
+    name=f"{ws_settings.prd_key}-workers-ng",
     min_size=2,
     max_size=5,
     desired_size=2,
@@ -132,7 +117,7 @@ prd_worker_eks_nodegroup = EksNodeGroup(
     eks_cluster=prd_eks_cluster,
     # Add the workers label to the nodegroup
     labels=workers_ng_label,
-    tags=prd_tags,
+    tags=ws_settings.prd_tags,
     skip_create=skip_create,
     skip_delete=skip_delete,
     wait_for_creation=wait_for_create,
@@ -141,12 +126,14 @@ prd_worker_eks_nodegroup = EksNodeGroup(
 
 # -*- ACM certificate for domain
 prd_acm_certificate = AcmCertificate(
-    name=prd_domain,
-    domain_name=prd_domain,
-    subject_alternative_names=[f"*.{prd_domain}"],
+    name=ws_settings.prd_domain,
+    domain_name=ws_settings.prd_domain,
+    subject_alternative_names=[f"*.{ws_settings.prd_domain}"],
     # Store the certificate ARN in the certificate_summary_file
     store_cert_summary=True,
-    certificate_summary_file=ws_dir_path.joinpath("aws", "acm", prd_domain),
+    certificate_summary_file=ws_settings.ws_dir_path.joinpath(
+        "aws", "acm", ws_settings.prd_domain
+    ),
     skip_create=skip_create,
     skip_delete=skip_delete,
     wait_for_creation=wait_for_create,
@@ -154,7 +141,7 @@ prd_acm_certificate = AcmCertificate(
 )
 
 prd_aws_resources = AwsResourceGroup(
-    name=prd_key,
+    name=ws_settings.prd_key,
     s3_buckets=[prd_logs_s3_bucket, prd_data_s3_bucket],
     eks_cluster=prd_eks_cluster,
     eks_kubeconfig=prd_eks_kubeconfig,

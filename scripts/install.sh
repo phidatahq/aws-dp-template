@@ -22,7 +22,7 @@ main() {
 
   print_heading "Installing requirements.txt"
   pip install --no-deps \
-    -r ${REPO_ROOT}/requirements.txt
+    -r ${REPO_ROOT}/requirements.txt --no-cache
 
   print_heading "Installing workspace ${REPO_ROOT}"
   pip install --editable "${REPO_ROOT}"

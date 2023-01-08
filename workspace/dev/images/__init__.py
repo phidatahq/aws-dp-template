@@ -1,73 +1,56 @@
 from phidata.infra.docker.resource.image import DockerImage
 
-from workspace.settings import (
-    airflow_enabled,
-    data_platform_dir_path,
-    jupyter_enabled,
-    superset_enabled,
-    use_cache,
-)
+from workspace.settings import ws_settings
 
 #
 # -*- Dev container images
 #
 
 dev_images = []
-
-# -*- Settings
+# Development image tag
 image_tag = "dev"
-image_repo = "phidata"  # Set your image repo
-image_suffix = "starter-aws-snowflake-ds"  # Set your image name suffix
-skip_docker_cache = False  # Skip docker cache when building images
-pull_docker_images = False  # Force pull images during FROM
-push_docker_images = True  # Push images to repo after building
 
 # -*- Airflow image
 dev_airflow_image = DockerImage(
-    name=f"{image_repo}/airflow-{image_suffix}",
+    name=f"{ws_settings.image_repo}/airflow-{ws_settings.image_suffix}",
     tag=image_tag,
-    path=str(data_platform_dir_path),
+    path=str(ws_settings.ws_dir_path.parent),
     dockerfile="workspace/dev/images/airflow.Dockerfile",
-    print_build_log=True,
-    pull=pull_docker_images,
-    push_image=push_docker_images,
-    skip_docker_cache=skip_docker_cache,
-    # use_cache=False will recreate the image every time you run `phi ws up`
-    # eg: `CACHE=f phi ws up`
-    use_cache=use_cache,
+    pull=ws_settings.pull_docker_images,
+    push_image=ws_settings.push_docker_images,
+    skip_docker_cache=ws_settings.skip_docker_cache,
+    use_cache=ws_settings.use_cache,
 )
 
-if airflow_enabled:
+if ws_settings.dev_airflow_enabled and ws_settings.build_images:
     dev_images.append(dev_airflow_image)
 
 # -*- Jupyter image
 dev_jupyter_image = DockerImage(
-    name=f"{image_repo}/jupyter-{image_suffix}",
+    name=f"{ws_settings.image_repo}/jupyter-{ws_settings.image_suffix}",
     tag=image_tag,
-    path=str(data_platform_dir_path),
+    path=str(ws_settings.ws_dir_path.parent),
     dockerfile="workspace/dev/images/jupyter.Dockerfile",
-    print_build_log=True,
-    pull=pull_docker_images,
-    push_image=push_docker_images,
-    skip_docker_cache=skip_docker_cache,
-    use_cache=use_cache,
+    pull=ws_settings.pull_docker_images,
+    push_image=ws_settings.push_docker_images,
+    skip_docker_cache=ws_settings.skip_docker_cache,
+    use_cache=ws_settings.use_cache,
 )
 
-if jupyter_enabled:
+if ws_settings.dev_jupyter_enabled and ws_settings.build_images:
     dev_images.append(dev_jupyter_image)
 
 # -*- Superset image
 dev_superset_image = DockerImage(
-    name=f"{image_repo}/superset-{image_suffix}",
+    name=f"{ws_settings.image_repo}/superset-{ws_settings.image_suffix}",
     tag=image_tag,
-    path=str(data_platform_dir_path),
+    path=str(ws_settings.ws_dir_path.parent),
     dockerfile="workspace/dev/images/superset.Dockerfile",
-    print_build_log=True,
-    pull=pull_docker_images,
-    push_image=push_docker_images,
-    skip_docker_cache=skip_docker_cache,
-    use_cache=use_cache,
+    pull=ws_settings.pull_docker_images,
+    push_image=ws_settings.push_docker_images,
+    skip_docker_cache=ws_settings.skip_docker_cache,
+    use_cache=ws_settings.use_cache,
 )
 
-# if superset_enabled:
-#     dev_images.append(dev_superset_image)
+if ws_settings.dev_superset_enabled and ws_settings.build_images:
+    dev_images.append(dev_superset_image)

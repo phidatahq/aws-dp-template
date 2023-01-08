@@ -10,7 +10,7 @@ from phidata.utils.common import (
     get_default_service_name,
 )
 
-from workspace.settings import whoami_enabled
+from workspace.settings import ws_settings
 
 whoami_name = "whoami"
 whoami_port = CreatePort(
@@ -44,7 +44,7 @@ whoami_service = CreateService(
 )
 whoami_k8s_rg = CreateK8sResourceGroup(
     name=whoami_name,
-    enabled=whoami_enabled,
+    enabled=ws_settings.prd_whoami_enabled,
     services=[whoami_service],
     deployments=[whoami_deployment],
 )

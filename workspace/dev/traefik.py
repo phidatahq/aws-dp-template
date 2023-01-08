@@ -1,9 +1,11 @@
 from phidata.infra.docker.resource.container import DockerContainer
 from phidata.infra.docker.resource.group import DockerResourceGroup
 
-from workspace.settings import traefik_enabled, use_cache, ws_name
+from workspace.settings import ws_settings
 
+#
 # -*- Traefik docker resources
+#
 
 # Traefik router
 traefik_container = DockerContainer(
@@ -17,7 +19,7 @@ traefik_container = DockerContainer(
         # reference: https://doc.traefik.io/traefik/providers/docker/#endpoint
         "--providers.docker.endpoint=unix:///var/run/docker.sock",
         # reference: https://doc.traefik.io/traefik/providers/docker/#network
-        f"--providers.docker.network={ws_name}",
+        f"--providers.docker.network={ws_settings.ws_name}",
         # reference: https://doc.traefik.io/traefik/operations/api/#configuration
         "--api=true",
         "--api.insecure=true",
@@ -29,7 +31,7 @@ traefik_container = DockerContainer(
         "traefik.http.routers.api.rule": "Host(`traefik.dp`)",
         "traefik.http.routers.api.service": "api@internal",
     },
-    network=ws_name,
+    network=ws_settings.ws_name,
     ports={
         "80": "80",
         "8080": "8380",
@@ -37,11 +39,11 @@ traefik_container = DockerContainer(
     volumes=[
         "/var/run/docker.sock:/var/run/docker.sock:ro",
     ],
-    use_cache=use_cache,
+    use_cache=ws_settings.use_cache,
 )
 
 dev_traefik_resources = DockerResourceGroup(
     name="traefik",
-    enabled=False,
+    enabled=ws_settings.dev_traefik_enabled,
     containers=[traefik_container],
 )

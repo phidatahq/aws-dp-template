@@ -1,7 +1,7 @@
 from phidata.app.postgres import PostgresDb
 
 from workflows.env import AIRFLOW_ENV
-from workspace.dev.pg_dbs import dev_pg_db, dev_pg_db_connection_id
+from workspace.dev.postgres import dev_pg_db, dev_pg_db_connection_id
 from workspace.prd.pg_dbs import prd_pg_db, prd_pg_db_connection_id
 
 # -*- Postgres Apps -*-
