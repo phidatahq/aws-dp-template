@@ -16,14 +16,7 @@ dependencies = [
     "pre-commit",
     "pytest",
     "ruff",
-    # "s3fs",
-    # "sqlmodel",
-]
-
-[project.optional-dependencies]
-pg = [
-    "connectorx>=0.2.0a3",
-    "psycopg2-binary",
+    "sqlmodel",
 ]
 
 [build-system]
