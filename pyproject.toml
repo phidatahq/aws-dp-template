@@ -11,7 +11,7 @@ dependencies = [
     "black",
     "httpx",
     "mypy",
-    # "phidata>=0.4.10",
+    "phidata>=0.4.10",
     "polars",
     "pre-commit",
     "pytest",
