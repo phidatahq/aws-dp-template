@@ -13,7 +13,7 @@ dev_jupyter = JupyterLab(
     image_name=dev_jupyter_image.name,
     image_tag=dev_jupyter_image.tag,
     mount_workspace=True,
-    # mounted when creating the image
+    # The jupyter_lab_config is mounted when creating the image
     jupyter_config_file="/usr/local/jupyter/jupyter_lab_config.py",
     # Read env variables from env/dev_jupyter_env.yml
     env_file=ws_settings.ws_dir_path.joinpath("env/dev_jupyter_env.yml"),

@@ -117,11 +117,11 @@ DATA_CACHE_CONFIG = {
 # http://flask-appbuilder.readthedocs.io/en/latest/security.html#authentication-methods
 # ----------------------------------------------------
 # Dev: Use AUTH_DB i.e. user/pass authentication
-# AUTH_TYPE = AUTH_DB
+AUTH_TYPE = AUTH_DB
 # Production: Use OAUTH i.e. Google, Facebook, GitHub authentication
-AUTH_TYPE = AUTH_OAUTH
+# AUTH_TYPE = AUTH_OAUTH
 # Allow user self registration
-AUTH_USER_REGISTRATION = True
+# AUTH_USER_REGISTRATION = True
 # The default user self registration role
 # This role will be given in addition to any AUTH_ROLES_MAPPING
 AUTH_USER_REGISTRATION_ROLE = "Public"

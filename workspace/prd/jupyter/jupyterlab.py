@@ -9,17 +9,10 @@ from workspace.prd.aws_resources import (
     workers_ng_label,
 )
 from workspace.prd.images import prd_jupyter_image
-from workspace.settings import (
-    aws_az_1a,
-    jupyter_enabled,
-    prd_key,
-    prd_tags,
-    use_cache,
-    ws_dir_path,
-)
+from workspace.settings import ws_settings
 
 # -*- Settings
-user_name: str = "user1"
+lab_id: str = "1"
 # Do not create the resource when running `phi ws up`
 skip_create: bool = False
 # Do not delete the resource when running `phi ws down`
@@ -30,15 +23,15 @@ wait_for_create: bool = True
 wait_for_delete: bool = False
 
 #
-# -*- AWS resources
+# -*- Jupyterlab AWS resources
 #
 # -*- EbsVolumes
-# EbsVolume for jupyter
+# EbsVolume for jupyterlab
 prd_jupyter_ebs_volume = EbsVolume(
-    name=f"jupyter-{user_name}-{prd_key}",
+    name=f"jupyter-{lab_id}-{ws_settings.prd_key}",
     size=16,
-    availability_zone=aws_az_1a,
-    tags=prd_tags,
+    availability_zone=ws_settings.aws_az1,
+    tags=ws_settings.prd_tags,
     skip_create=skip_create,
     skip_delete=skip_delete,
     wait_for_creation=wait_for_create,
@@ -46,29 +39,29 @@ prd_jupyter_ebs_volume = EbsVolume(
 )
 
 prd_jupyterlab_aws_resources = AwsResourceGroup(
-    name=f"jupyterlab-{user_name}",
-    enabled=jupyter_enabled,
+    name=f"jupyterlab-{lab_id}",
+    enabled=ws_settings.jupyter_enabled,
     volumes=[prd_jupyter_ebs_volume],
 )
 
 #
-# -*- Kubernetes resources
+# -*- Jupyterlab Kubernetes resources
 #
 # JupyterLab
 prd_jupyterlab = JupyterLab(
-    name=f"jupyterlab-{user_name}",
+    name=f"jupyterlab-{lab_id}",
     image_name=prd_jupyter_image.name,
     image_tag=prd_jupyter_image.tag,
     mount_ebs_volume=True,
     ebs_volume=prd_jupyter_ebs_volume,
-    # mounted when creating the image
+    # The jupyter_lab_config is mounted when creating the image
     jupyter_config_file="/usr/local/jupyter/jupyter_lab_config.py",
     # Read env variables from env/prd_jupyter_env.yml
-    env_file=ws_dir_path.joinpath("env/prd_jupyter_env.yml"),
+    env_file=ws_settings.ws_dir_path.joinpath("env/prd_jupyter_env.yml"),
     # Read secrets from secrets/prd_jupyter_secrets.yml
-    secrets_file=ws_dir_path.joinpath("secrets/prd_jupyter_secrets.yml"),
+    secrets_file=ws_settings.ws_dir_path.joinpath("secrets/prd_jupyter_secrets.yml"),
     image_pull_policy=ImagePullPolicy.ALWAYS,
-    use_cache=use_cache,
+    use_cache=ws_settings.use_cache,
     pod_node_selector=workers_ng_label,
     topology_spread_key=topology_spread_key,
     topology_spread_max_skew=topology_spread_max_skew,
@@ -76,7 +69,7 @@ prd_jupyterlab = JupyterLab(
 )
 
 prd_jupyterlab_apps = AppGroup(
-    name=f"jupyterlab-{user_name}",
-    enabled=jupyter_enabled,
+    name=f"jupyterlab-{lab_id}",
+    enabled=ws_settings.prd_jupyter_enabled,
     apps=[prd_jupyterlab],
 )

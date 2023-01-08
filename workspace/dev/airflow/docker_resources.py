@@ -7,14 +7,14 @@ from phidata.app.postgres import PostgresDb
 from phidata.app.redis import Redis
 
 from workspace.dev.images import dev_airflow_image
-from workspace.dev.postgres import dev_pg_db_airflow_connections
+from workspace.dev.postgres import dev_postgres_airflow_connections
 from workspace.settings import ws_settings
 
 #
 # -*- Airflow Docker resources
 #
 
-# Airflow db: A postgres instance to use as the database for airflow
+# -*- Airflow db: A postgres instance to use as the database for airflow
 dev_airflow_db = PostgresDb(
     name=f"airflow-db-{ws_settings.ws_name}",
     db_user="airflow",
@@ -24,7 +24,7 @@ dev_airflow_db = PostgresDb(
     container_host_port=8320,
 )
 
-# Airflow redis: A redis instance to use as the celery backend for airflow
+# -*- Airflow redis: A redis instance to use as the celery backend for airflow
 dev_airflow_redis = Redis(
     name=f"airflow-redis-{ws_settings.ws_name}",
     command=["redis-server", "--save", "60", "1"],
@@ -58,7 +58,7 @@ dev_airflow_env: Dict[str, str] = {
     "AIRFLOW__WEBSERVER__NAVBAR_COLOR": "#bbf7d0",
 }
 
-# Airflow webserver
+# -*- Airflow webserver
 dev_airflow_ws = AirflowWebserver(
     image_name=dev_airflow_image.name,
     image_tag=dev_airflow_image.tag,
@@ -72,10 +72,10 @@ dev_airflow_ws = AirflowWebserver(
     env_file=dev_airflow_env_file,
     secrets_file=dev_airflow_secrets_file,
     use_cache=ws_settings.use_cache,
-    db_connections=dev_pg_db_airflow_connections,
+    db_connections=dev_postgres_airflow_connections,
     # Access the airflow webserver on http://localhost:8310
     webserver_host_port=8310,
-    # Settings to mark as false after first run
+    # Mark as false after first run
     # Wait for scheduler to initialize airflow db -- mark as false after first run
     wait_for_db_init=True,
     # Run the airflow webserver on airflow.dp
@@ -88,7 +88,7 @@ dev_airflow_ws = AirflowWebserver(
     },
 )
 
-# Airflow scheduler
+# -*- Airflow scheduler
 dev_airflow_scheduler = AirflowScheduler(
     image_name=dev_airflow_image.name,
     image_tag=dev_airflow_image.tag,
@@ -102,8 +102,8 @@ dev_airflow_scheduler = AirflowScheduler(
     env_file=dev_airflow_env_file,
     secrets_file=dev_airflow_secrets_file,
     use_cache=ws_settings.use_cache,
-    db_connections=dev_pg_db_airflow_connections,
-    # Settings to mark as false after first run
+    db_connections=dev_postgres_airflow_connections,
+    # Mark as false after first run
     # Init airflow db on container start -- mark as false after first run
     init_airflow_db=True,
     # Upgrade the airflow db on container start -- mark as false after first run
@@ -112,7 +112,7 @@ dev_airflow_scheduler = AirflowScheduler(
     create_airflow_admin_user=True,
 )
 
-# Airflow worker serving the default & tier_1 workflows
+# -*- Airflow worker serving the default & tier_1 workflows
 dev_airflow_worker = AirflowWorker(
     queue_name="default,tier_1",
     image_name=dev_airflow_image.name,
@@ -127,8 +127,8 @@ dev_airflow_worker = AirflowWorker(
     env_file=dev_airflow_env_file,
     secrets_file=dev_airflow_secrets_file,
     use_cache=ws_settings.use_cache,
-    db_connections=dev_pg_db_airflow_connections,
-    # Settings to mark as false after first run
+    db_connections=dev_postgres_airflow_connections,
+    # Mark as false after first run
     # Wait for scheduler to initialize airflow db -- mark as false after first run
     wait_for_db_init=True,
 )

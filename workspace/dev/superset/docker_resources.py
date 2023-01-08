@@ -89,7 +89,6 @@ dev_superset_init = SupersetInit(
     load_examples=False,
 )
 
-
 dev_superset_apps = AppGroup(
     name="superset",
     enabled=ws_settings.dev_superset_enabled,

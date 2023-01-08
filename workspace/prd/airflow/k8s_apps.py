@@ -29,19 +29,32 @@ from workspace.prd.aws_resources import (
     workers_ng_label,
 )
 from workspace.prd.images import prd_airflow_image
-from workspace.prd.pg_dbs import prd_db_airflow_connections
-from workspace.settings import (
-    airflow_enabled,
-    aws_region,
-    prd_domain,
-    use_cache,
-    ws_dir_path,
-    ws_repo,
-)
+from workspace.prd.postgres import prd_postgres_airflow_connections
+from workspace.settings import ws_settings
 
 #
-# -*- Kubernetes resources
+# -*- Airflow Kubernetes resources
 #
+
+# -*- Airflow db: A postres instance to use as the database for airflow
+prd_airflow_db = PostgresDb(
+    name="af-db",
+    enabled=(not use_rds),
+    volume_type=PostgresVolumeType.AWS_EBS,
+    ebs_volume=prd_airflow_db_volume,
+    secrets_file=ws_settings.ws_dir_path.joinpath("secrets/prd_airflow_db_secrets.yml"),
+    pod_node_selector=services_ng_label,
+)
+
+# -*- Airflow redis: A redis instance to use as the celery backend for airflow
+prd_airflow_redis = Redis(
+    name="af-redis",
+    enabled=(not use_elasticache),
+    volume_type=RedisVolumeType.AWS_EBS,
+    ebs_volume=prd_airflow_redis_volume,
+    command=["redis-server", "--save", "60", "1"],
+    pod_node_selector=services_ng_label,
+)
 
 # -*- Settings
 # waits for airflow-db to be ready before starting app
@@ -55,44 +68,28 @@ mount_workspace: bool = True
 # Mount the main branch of the ws_repo
 git_sync_branch: str = "main"
 # Read env variables from env/prd_airflow_env.yml
-prd_airflow_env_file: Path = ws_dir_path.joinpath("env/prd_airflow_env.yml")
+prd_airflow_env_file: Path = ws_settings.ws_dir_path.joinpath("env/prd_airflow_env.yml")
 # Read secrets from secrets/prd_airflow_secrets.yml
-prd_airflow_secrets_file: Path = ws_dir_path.joinpath("secrets/prd_airflow_secrets.yml")
+prd_airflow_secrets_file: Path = ws_settings.ws_dir_path.joinpath(
+    "secrets/prd_airflow_secrets.yml"
+)
 # Add airflow configuration using env variables
 prd_airflow_env: Dict[str, str] = {
-    "AIRFLOW__WEBSERVER__BASE_URL": f"https://airflow.{prd_domain}",
+    "AIRFLOW__WEBSERVER__BASE_URL": f"https://airflow.{ws_settings.prd_domain}",
     "AIRFLOW__WEBSERVER__EXPOSE_CONFIG": "True",
     "AIRFLOW__WEBSERVER__EXPOSE_HOSTNAME": "True",
     "AIRFLOW__WEBSERVER__EXPOSE_STACKTRACE": "True",
     "AIRFLOW__WEBSERVER__ENABLE_PROXY_FIX": "True",
     # Create aws_default connection_id
-    "AWS_DEFAULT_REGION": aws_region,
+    "AWS_DEFAULT_REGION": ws_settings.aws_region,
     "AIRFLOW_CONN_AWS_DEFAULT": "aws://",
     # Enable remote logging using s3
     "AIRFLOW__LOGGING__REMOTE_LOGGING": "True",
     "AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER": f"s3://{prd_logs_s3_bucket.name}/airflow",
     "AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID": "aws_default",
+    # Airflow Navbar color
+    "AIRFLOW__WEBSERVER__NAVBAR_COLOR": "#bbf7d0",
 }
-
-# -*- Airflow db: A postres instance to use as the database for airflow
-prd_airflow_db = PostgresDb(
-    name="af-db",
-    enabled=(not use_rds),
-    volume_type=PostgresVolumeType.AWS_EBS,
-    ebs_volume=prd_airflow_db_volume,
-    secrets_file=ws_dir_path.joinpath("secrets/prd_airflow_db_secrets.yml"),
-    pod_node_selector=services_ng_label,
-)
-
-# -*- Airflow redis: A redis instance to use as the celery backend for airflow
-prd_airflow_redis = Redis(
-    name="af-redis",
-    enabled=(not use_elasticache),
-    volume_type=RedisVolumeType.AWS_EBS,
-    ebs_volume=prd_airflow_redis_volume,
-    command=["redis-server", "--save", "60", "1"],
-    pod_node_selector=services_ng_label,
-)
 
 # -*- Database configuration
 db_user = (
@@ -146,19 +143,19 @@ prd_airflow_ws = AirflowWebserver(
     redis_port=redis_port,
     mount_workspace=mount_workspace,
     create_git_sync_sidecar=True,
-    git_sync_repo=ws_repo,
+    git_sync_repo=ws_settings.ws_repo,
     git_sync_branch=git_sync_branch,
     env=prd_airflow_env,
     env_file=prd_airflow_env_file,
-    db_connections=prd_db_airflow_connections,
+    db_connections=prd_postgres_airflow_connections,
     secrets_file=prd_airflow_secrets_file,
     image_pull_policy=ImagePullPolicy.ALWAYS,
-    use_cache=use_cache,
+    use_cache=ws_settings.use_cache,
     pod_node_selector=services_ng_label,
     topology_spread_key=topology_spread_key,
     topology_spread_max_skew=topology_spread_max_skew,
     topology_spread_when_unsatisfiable=topology_spread_when_unsatisfiable,
-    # Settings to mark as false after first run
+    # Mark as false after first run
     # Wait for scheduler to initialize airflow db -- mark as false after first run
     wait_for_db_init=True,
 )
@@ -184,19 +181,19 @@ prd_airflow_scheduler = AirflowScheduler(
     redis_port=redis_port,
     mount_workspace=mount_workspace,
     create_git_sync_sidecar=True,
-    git_sync_repo=ws_repo,
+    git_sync_repo=ws_settings.ws_repo,
     git_sync_branch=git_sync_branch,
     env=prd_airflow_env,
     env_file=prd_airflow_env_file,
-    db_connections=prd_db_airflow_connections,
+    db_connections=prd_postgres_airflow_connections,
     secrets_file=prd_airflow_secrets_file,
     image_pull_policy=ImagePullPolicy.ALWAYS,
-    use_cache=use_cache,
+    use_cache=ws_settings.use_cache,
     pod_node_selector=services_ng_label,
     topology_spread_key=topology_spread_key,
     topology_spread_max_skew=topology_spread_max_skew,
     topology_spread_when_unsatisfiable=topology_spread_when_unsatisfiable,
-    # Settings to mark as false after first run
+    # Mark as false after first run
     # Init airflow db on container start -- mark as false after first run
     init_airflow_db=True,
     # Upgrade the airflow db on container start -- mark as false after first run
@@ -205,7 +202,7 @@ prd_airflow_scheduler = AirflowScheduler(
     create_airflow_admin_user=True,
 )
 
-# -*- Airflow workers
+# -*- Airflow workers serving the default & tier_1 workflows
 prd_airflow_worker = AirflowWorker(
     replicas=2,
     queue_name="default,tier_1",
@@ -227,19 +224,19 @@ prd_airflow_worker = AirflowWorker(
     redis_port=redis_port,
     mount_workspace=mount_workspace,
     create_git_sync_sidecar=True,
-    git_sync_repo=ws_repo,
+    git_sync_repo=ws_settings.ws_repo,
     git_sync_branch=git_sync_branch,
     env=prd_airflow_env,
     env_file=prd_airflow_env_file,
-    db_connections=prd_db_airflow_connections,
+    db_connections=prd_postgres_airflow_connections,
     secrets_file=prd_airflow_secrets_file,
     image_pull_policy=ImagePullPolicy.ALWAYS,
-    use_cache=use_cache,
+    use_cache=ws_settings.use_cache,
     pod_node_selector=workers_ng_label,
     topology_spread_key=topology_spread_key,
     topology_spread_max_skew=topology_spread_max_skew,
     topology_spread_when_unsatisfiable=topology_spread_when_unsatisfiable,
-    # Settings to mark as false after first run
+    # Mark as false after first run
     # Wait for scheduler to initialize airflow db -- mark as false after first run
     wait_for_db_init=True,
 )
@@ -265,26 +262,26 @@ prd_airflow_flower = AirflowFlower(
     redis_port=redis_port,
     mount_workspace=mount_workspace,
     create_git_sync_sidecar=True,
-    git_sync_repo=ws_repo,
+    git_sync_repo=ws_settings.ws_repo,
     git_sync_branch=git_sync_branch,
     env=prd_airflow_env,
     env_file=prd_airflow_env_file,
-    db_connections=prd_db_airflow_connections,
+    db_connections=prd_postgres_airflow_connections,
     secrets_file=prd_airflow_secrets_file,
     image_pull_policy=ImagePullPolicy.ALWAYS,
-    use_cache=use_cache,
+    use_cache=ws_settings.use_cache,
     pod_node_selector=services_ng_label,
     topology_spread_key=topology_spread_key,
     topology_spread_max_skew=topology_spread_max_skew,
     topology_spread_when_unsatisfiable=topology_spread_when_unsatisfiable,
-    # Settings to mark as false after first run
+    # Mark as false after first run
     # Wait for scheduler to initialize airflow db -- mark as false after first run
     wait_for_db_init=True,
 )
 
 prd_airflow_apps = AppGroup(
     name="airflow",
-    enabled=airflow_enabled,
+    enabled=ws_settings.prd_airflow_enabled,
     apps=[
         prd_airflow_db,
         prd_airflow_redis,

@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Dict
 
 from phidata.app.superset import (
     SupersetInit,
@@ -28,16 +27,31 @@ from workspace.prd.aws_resources import (
     workers_ng_label,
 )
 from workspace.prd.images import prd_superset_image
-from workspace.settings import (
-    superset_enabled,
-    use_cache,
-    ws_dir_path,
-    ws_repo,
-)
+from workspace.settings import ws_settings
 
 #
-# -*- Kubernetes resources
+# -*- Superset Kubernetes resources
 #
+
+# -*- Superset db: A postgres instance to use as the database for superset
+prd_superset_db = PostgresDb(
+    name="ss-db",
+    volume_type=PostgresVolumeType.AWS_EBS,
+    ebs_volume=prd_superset_db_volume,
+    secrets_file=ws_settings.ws_dir_path.joinpath(
+        "secrets/prd_superset_db_secrets.yml"
+    ),
+    pod_node_selector=services_ng_label,
+)
+
+# -*- Superset redis: A redis instance to use as the celery backend for superset
+prd_superset_redis = Redis(
+    name="ss-redis",
+    volume_type=RedisVolumeType.AWS_EBS,
+    ebs_volume=prd_superset_redis_volume,
+    command=["redis-server", "--save", "60", "1"],
+    pod_node_selector=services_ng_label,
+)
 
 # -*- Settings
 # waits for superset-db to be ready before starting app
@@ -49,28 +63,12 @@ mount_workspace: bool = False
 # Mount the main branch
 git_sync_branch: str = "main"
 # Read env variables from env/prd_superset_env.yml
-prd_superset_env_file: Path = ws_dir_path.joinpath("env/prd_superset_env.yml")
+prd_superset_env_file: Path = ws_settings.ws_dir_path.joinpath(
+    "env/prd_superset_env.yml"
+)
 # Read secrets from secrets/prd_superset_secrets.yml
-prd_superset_secrets_file: Path = ws_dir_path.joinpath(
+prd_superset_secrets_file: Path = ws_settings.ws_dir_path.joinpath(
     "secrets/prd_superset_secrets.yml"
-)
-
-# -*- Superset db: A postgres instance to use as the database for superset
-prd_superset_db = PostgresDb(
-    name="ss-db",
-    volume_type=PostgresVolumeType.AWS_EBS,
-    ebs_volume=prd_superset_db_volume,
-    secrets_file=ws_dir_path.joinpath("secrets/prd_superset_db_secrets.yml"),
-    pod_node_selector=services_ng_label,
-)
-
-# -*- Superset redis: A redis instance to use as the celery backend for superset
-prd_superset_redis = Redis(
-    name="ss-redis",
-    volume_type=RedisVolumeType.AWS_EBS,
-    ebs_volume=prd_superset_redis_volume,
-    command=["redis-server", "--save", "60", "1"],
-    pod_node_selector=services_ng_label,
 )
 
 # -*- Database configuration
@@ -122,12 +120,12 @@ prd_superset_ws = SupersetWebserver(
     redis_port=redis_port,
     mount_workspace=mount_workspace,
     create_git_sync_sidecar=True,
-    git_sync_repo=ws_repo,
+    git_sync_repo=ws_settings.ws_repo,
     git_sync_branch=git_sync_branch,
     env_file=prd_superset_env_file,
     secrets_file=prd_superset_secrets_file,
     image_pull_policy=ImagePullPolicy.ALWAYS,
-    use_cache=use_cache,
+    use_cache=ws_settings.use_cache,
     pod_node_selector=services_ng_label,
     topology_spread_key=topology_spread_key,
     topology_spread_max_skew=topology_spread_max_skew,
@@ -137,7 +135,7 @@ prd_superset_ws = SupersetWebserver(
 # -*- Superset init
 superset_init_enabled = True  # Mark as False after first run
 prd_superset_init = SupersetInit(
-    enabled=(superset_enabled and superset_init_enabled),
+    enabled=superset_init_enabled,
     image_name=prd_superset_image.name,
     image_tag=prd_superset_image.tag,
     wait_for_db=wait_for_db,
@@ -154,12 +152,12 @@ prd_superset_init = SupersetInit(
     redis_port=redis_port,
     mount_workspace=mount_workspace,
     create_git_sync_sidecar=True,
-    git_sync_repo=ws_repo,
+    git_sync_repo=ws_settings.ws_repo,
     git_sync_branch=git_sync_branch,
     env_file=prd_superset_env_file,
     secrets_file=prd_superset_secrets_file,
     image_pull_policy=ImagePullPolicy.ALWAYS,
-    use_cache=use_cache,
+    use_cache=ws_settings.use_cache,
     pod_node_selector=workers_ng_label,
     topology_spread_key=topology_spread_key,
     topology_spread_max_skew=topology_spread_max_skew,
@@ -185,12 +183,12 @@ prd_superset_worker = SupersetWorker(
     redis_port=redis_port,
     mount_workspace=mount_workspace,
     create_git_sync_sidecar=True,
-    git_sync_repo=ws_repo,
+    git_sync_repo=ws_settings.ws_repo,
     git_sync_branch=git_sync_branch,
     env_file=prd_superset_env_file,
     secrets_file=prd_superset_secrets_file,
     image_pull_policy=ImagePullPolicy.ALWAYS,
-    use_cache=use_cache,
+    use_cache=ws_settings.use_cache,
     pod_node_selector=workers_ng_label,
     topology_spread_key=topology_spread_key,
     topology_spread_max_skew=topology_spread_max_skew,
@@ -216,12 +214,12 @@ prd_superset_worker_beat = SupersetWorkerBeat(
     redis_port=redis_port,
     mount_workspace=mount_workspace,
     create_git_sync_sidecar=True,
-    git_sync_repo=ws_repo,
+    git_sync_repo=ws_settings.ws_repo,
     git_sync_branch=git_sync_branch,
     env_file=prd_superset_env_file,
     secrets_file=prd_superset_secrets_file,
     image_pull_policy=ImagePullPolicy.ALWAYS,
-    use_cache=use_cache,
+    use_cache=ws_settings.use_cache,
     pod_node_selector=workers_ng_label,
     topology_spread_key=topology_spread_key,
     topology_spread_max_skew=topology_spread_max_skew,
@@ -230,7 +228,7 @@ prd_superset_worker_beat = SupersetWorkerBeat(
 
 prd_superset_apps = AppGroup(
     name="superset",
-    enabled=superset_enabled,
+    enabled=ws_settings.prd_superset_enabled,
     apps=[
         prd_superset_db,
         prd_superset_redis,

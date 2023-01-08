@@ -62,9 +62,9 @@ services_ng_label = {"app_type": "service"}
 workers_ng_label = {"app_type": "worker"}
 # How to distribute pods across EKS nodes
 # "kubernetes.io/hostname" means spread across nodes
-topology_spread_key: str = "kubernetes.io/hostname"
-topology_spread_max_skew: int = 2
-topology_spread_when_unsatisfiable: str = "DoNotSchedule"
+topology_spread_key = "kubernetes.io/hostname"
+topology_spread_max_skew = 2
+topology_spread_when_unsatisfiable = "DoNotSchedule"
 
 # -*- EKS cluster
 prd_eks_cluster = EksCluster(
@@ -147,6 +147,6 @@ prd_aws_resources = AwsResourceGroup(
     eks_kubeconfig=prd_eks_kubeconfig,
     eks_nodegroups=[prd_services_eks_nodegroup, prd_worker_eks_nodegroup],
     cloudformation_stacks=[prd_vpc_stack],
-    # Uncomment to create an ACM certificate for domain
+    # Uncomment to create ACM certificate
     # acm_certificates=[prd_acm_certificate],
 )

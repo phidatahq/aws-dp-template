@@ -4,4 +4,3 @@ apache-airflow-providers-amazon==5.1.0
 apache-airflow-providers-papermill==3.0.0
 ipython==8.6.0
 ipykernel>=6
-authlib==1.2.0

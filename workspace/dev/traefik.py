@@ -4,7 +4,7 @@ from phidata.infra.docker.resource.group import DockerResourceGroup
 from workspace.settings import ws_settings
 
 #
-# -*- Traefik docker resources
+# -*- Traefik Docker resources
 #
 
 # Traefik router

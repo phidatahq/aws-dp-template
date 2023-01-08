@@ -12,23 +12,15 @@ from workspace.prd.airflow.k8s_apps import prd_airflow_flower, prd_airflow_ws
 from workspace.prd.jupyter.jupyterlab import prd_jupyterlab
 from workspace.prd.superset.k8s_apps import prd_superset_ws
 from workspace.k8s.whoami import whoami_port, whoami_service
-from workspace.settings import (
-    airflow_enabled,
-    jupyter_enabled,
-    prd_domain,
-    superset_enabled,
-    traefik_enabled,
-    use_cache,
-    ws_dir_path,
-)
+from workspace.settings import ws_settings
 
 #
-# -*- Kubernetes resources
+# -*- Traefik Kubernetes resources
 #
 # Traefik Ingress: For routing web requests within the EKS cluster
 routes = [
     {
-        "match": f"Host(`whoami.{prd_domain}`)",
+        "match": f"Host(`whoami.{ws_settings.prd_domain}`)",
         "kind": "Rule",
         "services": [
             {
@@ -39,10 +31,10 @@ routes = [
     },
 ]
 
-if airflow_enabled:
+if ws_settings.prd_airflow_enabled:
     routes.append(
         {
-            "match": f"Host(`airflow.{prd_domain}`)",
+            "match": f"Host(`airflow.{ws_settings.prd_domain}`)",
             "kind": "Rule",
             "services": [
                 {
@@ -54,7 +46,7 @@ if airflow_enabled:
     )
     routes.append(
         {
-            "match": f"Host(`flower.{prd_domain}`)",
+            "match": f"Host(`flower.{ws_settings.prd_domain}`)",
             "kind": "Rule",
             "services": [
                 {
@@ -65,10 +57,10 @@ if airflow_enabled:
         }
     )
 
-if superset_enabled:
+if ws_settings.prd_superset_enabled:
     routes.append(
         {
-            "match": f"Host(`superset.{prd_domain}`)",
+            "match": f"Host(`superset.{ws_settings.prd_domain}`)",
             "kind": "Rule",
             "services": [
                 {
@@ -79,10 +71,10 @@ if superset_enabled:
         }
     )
 
-if jupyter_enabled:
+if ws_settings.prd_jupyter_enabled:
     routes.append(
         {
-            "match": f"Host(`jupyterlab.{prd_domain}`)",
+            "match": f"Host(`jupyterlab.{ws_settings.prd_domain}`)",
             "kind": "Rule",
             "services": [
                 {
@@ -93,10 +85,9 @@ if jupyter_enabled:
         }
     )
 
-traefik_name = "traefik"
 traefik_ingress_route = IngressRoute(
     replicas=3,
-    name=traefik_name,
+    name="traefik",
     web_enabled=True,
     web_routes=routes,
     # -*-
@@ -117,12 +108,12 @@ traefik_ingress_route = IngressRoute(
     # Enable traefik dashboard
     dashboard_enabled=True,
     # Serve traefik dashboard at traefik.prd_domain
-    domain_name=prd_domain,
+    domain_name=ws_settings.prd_domain,
     # The dashboard is gated behind a user:password, which is generated using the cmd:
     #   htpasswd -nb user password
     # You can provide the "users:password" list as DASHBOARD_AUTH_USERS in the secrets_file
-    secrets_file=ws_dir_path.joinpath("secrets/prd_traefik_secrets.yml"),
-    use_cache=use_cache,
+    secrets_file=ws_settings.ws_dir_path.joinpath("secrets/prd_traefik_secrets.yml"),
+    use_cache=ws_settings.use_cache,
     pod_node_selector=services_ng_label,
     topology_spread_key=topology_spread_key,
     topology_spread_max_skew=topology_spread_max_skew,
@@ -131,6 +122,6 @@ traefik_ingress_route = IngressRoute(
 
 prd_traefik_apps = AppGroup(
     name="traefik",
-    enabled=traefik_enabled,
+    enabled=ws_settings.prd_traefik_enabled,
     apps=[traefik_ingress_route],
 )

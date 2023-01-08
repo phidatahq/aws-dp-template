@@ -23,4 +23,5 @@ ws_config = WorkspaceConfig(
         dev_docker_config,
         prd_docker_config,
     ],
+    ws_settings=ws_settings,
 )
