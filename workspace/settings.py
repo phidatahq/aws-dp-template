@@ -16,11 +16,11 @@ ws_settings = WorkspaceSettings(
     dev_env="dev",
     # -*- Dev Apps
     dev_postgres_enabled=True,
-    dev_airflow_enabled=False,
-    dev_superset_enabled=False,
-    dev_jupyter_enabled=False,
-    dev_traefik_enabled=False,
-    dev_monitor_enabled=False,
+    dev_airflow_enabled=True,
+    dev_superset_enabled=True,
+    dev_jupyter_enabled=True,
+    dev_traefik_enabled=True,
+    dev_monitor_enabled=True,
     # -*- Production settings
     prd_env="prd",
     # Domain for the production platform

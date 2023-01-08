@@ -38,9 +38,7 @@ prd_superset_db = PostgresDb(
     name="ss-db",
     volume_type=PostgresVolumeType.AWS_EBS,
     ebs_volume=prd_superset_db_volume,
-    secrets_file=ws_settings.ws_dir.joinpath(
-        "secrets/prd_superset_db_secrets.yml"
-    ),
+    secrets_file=ws_settings.ws_dir.joinpath("secrets/prd_superset_db_secrets.yml"),
     pod_node_selector=services_ng_label,
 )
 
@@ -63,9 +61,7 @@ mount_workspace: bool = False
 # Mount the main branch
 git_sync_branch: str = "main"
 # Read env variables from env/prd_superset_env.yml
-prd_superset_env_file: Path = ws_settings.ws_dir.joinpath(
-    "env/prd_superset_env.yml"
-)
+prd_superset_env_file: Path = ws_settings.ws_dir.joinpath("env/prd_superset_env.yml")
 # Read secrets from secrets/prd_superset_secrets.yml
 prd_superset_secrets_file: Path = ws_settings.ws_dir.joinpath(
     "secrets/prd_superset_secrets.yml"

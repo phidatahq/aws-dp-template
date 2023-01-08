@@ -94,9 +94,7 @@ prd_superset_rds_db = DbInstance(
     db_subnet_group=prd_rds_subnet_group,
     enable_performance_insights=True,
     vpc_security_group_ids=ws_settings.security_groups,
-    secrets_file=ws_settings.ws_dir.joinpath(
-        "secrets/prd_superset_db_secrets.yml"
-    ),
+    secrets_file=ws_settings.ws_dir.joinpath("secrets/prd_superset_db_secrets.yml"),
     skip_create=skip_create,
     skip_delete=skip_delete,
     wait_for_creation=wait_for_create,
