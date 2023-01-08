@@ -9,18 +9,20 @@ authors = [
 
 dependencies = [
     "black",
+    "httpx",
     "mypy",
-    "phidata>=0.4.10",
+    # "phidata>=0.4.10",
+    "polars",
     "pre-commit",
     "pytest",
-    "requests",
     "ruff",
-    "duckdb",
-    "sqlmodel",
+    # "s3fs",
+    # "sqlmodel",
 ]
 
 [project.optional-dependencies]
 pg = [
+    "connectorx>=0.2.0a3",
     "psycopg2-binary",
 ]
 

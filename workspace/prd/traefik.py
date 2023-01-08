@@ -9,16 +9,13 @@ from workspace.prd.aws_resources import (
     topology_spread_when_unsatisfiable,
 )
 from workspace.prd.airflow.k8s_apps import prd_airflow_flower, prd_airflow_ws
-from workspace.prd.jupyter.jupyterlab_user1 import prd_jupyter as prd_jupyter_user1
-from workspace.prd.jupyter.jupyterlab_user2 import prd_jupyter as prd_jupyter_user2
-from workspace.prd.jupyter.jupyterlab_user3 import prd_jupyter as prd_jupyter_user3
+from workspace.prd.jupyter.jupyterlab import prd_jupyterlab
 from workspace.prd.superset.k8s_apps import prd_superset_ws
 from workspace.k8s.whoami import whoami_port, whoami_service
 from workspace.settings import (
     airflow_enabled,
     jupyter_enabled,
     prd_domain,
-    private_subnets,
     superset_enabled,
     traefik_enabled,
     use_cache,
@@ -83,39 +80,17 @@ if superset_enabled:
     )
 
 if jupyter_enabled:
-    routes.extend(
-        [
-            {
-                "match": f"Host(`lab1.{prd_domain}`)",
-                "kind": "Rule",
-                "services": [
-                    {
-                        "name": prd_jupyter_user1.get_app_service_name(),
-                        "port": prd_jupyter_user1.get_app_service_port(),
-                    }
-                ],
-            },
-            {
-                "match": f"Host(`lab2.{prd_domain}`)",
-                "kind": "Rule",
-                "services": [
-                    {
-                        "name": prd_jupyter_user2.get_app_service_name(),
-                        "port": prd_jupyter_user2.get_app_service_port(),
-                    }
-                ],
-            },
-            {
-                "match": f"Host(`lab3.{prd_domain}`)",
-                "kind": "Rule",
-                "services": [
-                    {
-                        "name": prd_jupyter_user3.get_app_service_name(),
-                        "port": prd_jupyter_user3.get_app_service_port(),
-                    }
-                ],
-            },
-        ]
+    routes.append(
+        {
+            "match": f"Host(`jupyterlab.{prd_domain}`)",
+            "kind": "Rule",
+            "services": [
+                {
+                    "name": prd_jupyterlab.get_app_service_name(),
+                    "port": prd_jupyterlab.get_app_service_port(),
+                }
+            ],
+        }
     )
 
 traefik_name = "traefik"
@@ -139,10 +114,6 @@ traefik_ingress_route = IngressRoute(
     load_balancer_provider=LoadBalancerProvider.AWS,
     # Use a Network LoadBalancer
     use_nlb=True,
-    # Use the private subnets
-    # load_balancer_subnets=private_subnets,
-    # Use an internal load balancer
-    # load_balancer_scheme="internal",
     # Enable traefik dashboard
     dashboard_enabled=True,
     # Serve traefik dashboard at traefik.prd_domain

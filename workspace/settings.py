@@ -58,6 +58,7 @@ aws_az_1b: str = "us-east-1b"
 public_subnets: List[str] = ["subnet-x0x0", "subnet-x0x0"]
 # 2 private subnets. 1 in each AZ.
 private_subnets: List[str] = ["subnet-x0x0", "subnet-x0x0"]
+subnet_ids: List[str] = public_subnets + private_subnets
 # Security Groups
 security_groups: Optional[List[str]] = None
 

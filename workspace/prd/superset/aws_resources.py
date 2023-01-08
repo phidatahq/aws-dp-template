@@ -7,12 +7,13 @@ from phidata.infra.aws.resource.group import (
     EbsVolume,
 )
 
+from workspace.prd.aws_resources import prd_vpc_stack
 from workspace.settings import (
     superset_enabled,
     aws_az_1a,
     prd_key,
     prd_tags,
-    private_subnets,
+    subnet_ids,
     security_groups,
     ws_dir_path,
 )
@@ -22,15 +23,18 @@ from workspace.settings import (
 #
 
 # -*- Settings
-aws_skip_create: bool = False
-# Prevents deletion when running `phi ws down`
-aws_skip_delete: bool = False
-aws_wait_for_create: bool = True
-aws_wait_for_delete: bool = False
 # Use RDS as database instead of running postgres on k8s
-use_rds: bool = True
+use_rds: bool = False
 # Use ElastiCache as cache instead of running redis on k8s
-use_elasticache: bool = True
+use_elasticache: bool = False
+# Do not create the resource when running `phi ws up`
+skip_create: bool = False
+# Do not delete the resource when running `phi ws down`
+skip_delete: bool = False
+# Wait for the resource to be created
+wait_for_create: bool = True
+# Wait for the resource to be deleted
+wait_for_delete: bool = False
 
 # -*- EbsVolumes for superset database and cache
 # NOTE: For production, use RDS and ElastiCache instead of running postgres/redis on k8s.
@@ -39,46 +43,48 @@ prd_superset_db_volume = EbsVolume(
     name=f"superset-db-{prd_key}",
     enabled=(not use_rds),
     size=32,
-    availability_zone=aws_az_1a,
     tags=prd_tags,
-    skip_create=aws_skip_create,
-    skip_delete=aws_skip_delete,
-    wait_for_creation=aws_wait_for_create,
-    wait_for_deletion=aws_wait_for_delete
+    availability_zone=aws_az_1a,
+    skip_create=skip_create,
+    skip_delete=skip_delete,
+    wait_for_creation=wait_for_create,
+    wait_for_deletion=wait_for_delete,
 )
 # EbsVolume for superset-redis
 prd_superset_redis_volume = EbsVolume(
     name=f"superset-redis-{prd_key}",
     enabled=(not use_elasticache),
     size=16,
-    availability_zone=aws_az_1a,
     tags=prd_tags,
-    skip_create=aws_skip_create,
-    skip_delete=aws_skip_delete,
-    wait_for_creation=aws_wait_for_create,
-    wait_for_deletion=aws_wait_for_delete
+    availability_zone=aws_az_1a,
+    skip_create=skip_create,
+    skip_delete=skip_delete,
+    wait_for_creation=wait_for_create,
+    wait_for_deletion=wait_for_delete,
 )
 
 # -*- RDS Database Subnet Group
 prd_rds_subnet_group = DbSubnetGroup(
     name=f"{prd_key}-db-sg",
     enabled=use_rds,
-    subnet_ids=private_subnets,
-    skip_create=aws_skip_create,
-    skip_delete=aws_skip_delete,
-    wait_for_creation=aws_wait_for_create,
-    wait_for_deletion=aws_wait_for_delete
+    # subnet_ids=subnet_ids,
+    vpc_stack=prd_vpc_stack,
+    skip_create=skip_create,
+    skip_delete=skip_delete,
+    wait_for_creation=wait_for_create,
+    wait_for_deletion=wait_for_delete,
 )
 
 # -*- Elasticache Subnet Group
 prd_elasticache_subnet_group = CacheSubnetGroup(
     name=f"{prd_key}-cache-sg",
     enabled=use_elasticache,
-    subnet_ids=private_subnets,
-    skip_create=aws_skip_create,
-    skip_delete=aws_skip_delete,
-    wait_for_creation=aws_wait_for_create,
-    wait_for_deletion=aws_wait_for_delete
+    # subnet_ids=subnet_ids,
+    vpc_stack=prd_vpc_stack,
+    skip_create=skip_create,
+    skip_delete=skip_delete,
+    wait_for_creation=wait_for_create,
+    wait_for_deletion=wait_for_delete,
 )
 
 # -*- RDS Database Instance
@@ -97,10 +103,10 @@ prd_superset_rds_db = DbInstance(
     enable_performance_insights=True,
     vpc_security_group_ids=security_groups,
     secrets_file=ws_dir_path.joinpath("secrets/prd_superset_db_secrets.yml"),
-    skip_create=aws_skip_create,
-    skip_delete=aws_skip_delete,
-    wait_for_creation=aws_wait_for_create,
-    wait_for_deletion=aws_wait_for_delete
+    skip_create=skip_create,
+    skip_delete=skip_delete,
+    wait_for_creation=wait_for_create,
+    wait_for_deletion=wait_for_delete,
 )
 
 # -*- Elasticache Redis Cluster
@@ -115,18 +121,18 @@ prd_superset_redis_cluster = CacheCluster(
     security_group_ids=security_groups,
     cache_subnet_group=prd_elasticache_subnet_group,
     preferred_availability_zone=aws_az_1a,
-    skip_create=aws_skip_create,
-    skip_delete=aws_skip_delete,
-    wait_for_creation=aws_wait_for_create,
-    wait_for_deletion=aws_wait_for_delete
+    skip_create=skip_create,
+    skip_delete=skip_delete,
+    wait_for_creation=wait_for_create,
+    wait_for_deletion=wait_for_delete,
 )
 
 prd_superset_aws_resources = AwsResourceGroup(
     name="superset",
     enabled=superset_enabled,
-    volumes=[prd_superset_db_volume, prd_superset_redis_volume],
     db_instances=[prd_superset_rds_db],
     db_subnet_groups=[prd_rds_subnet_group],
     cache_clusters=[prd_superset_redis_cluster],
     cache_subnet_groups=[prd_elasticache_subnet_group],
+    volumes=[prd_superset_db_volume, prd_superset_redis_volume],
 )

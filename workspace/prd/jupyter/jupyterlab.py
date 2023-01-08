@@ -20,8 +20,14 @@ from workspace.settings import (
 
 # -*- Settings
 user_name: str = "user1"
-# Prevents deletion of aws resources when running `phi ws down`
-aws_skip_delete: bool = False
+# Do not create the resource when running `phi ws up`
+skip_create: bool = False
+# Do not delete the resource when running `phi ws down`
+skip_delete: bool = False
+# Wait for the resource to be created
+wait_for_create: bool = True
+# Wait for the resource to be deleted
+wait_for_delete: bool = False
 
 #
 # -*- AWS resources
@@ -33,10 +39,13 @@ prd_jupyter_ebs_volume = EbsVolume(
     size=16,
     availability_zone=aws_az_1a,
     tags=prd_tags,
-    skip_delete=aws_skip_delete,
+    skip_create=skip_create,
+    skip_delete=skip_delete,
+    wait_for_creation=wait_for_create,
+    wait_for_deletion=wait_for_delete,
 )
 
-prd_jupyter_aws_resources = AwsResourceGroup(
+prd_jupyterlab_aws_resources = AwsResourceGroup(
     name=f"jupyterlab-{user_name}",
     enabled=jupyter_enabled,
     volumes=[prd_jupyter_ebs_volume],
@@ -46,7 +55,7 @@ prd_jupyter_aws_resources = AwsResourceGroup(
 # -*- Kubernetes resources
 #
 # JupyterLab
-prd_jupyter = JupyterLab(
+prd_jupyterlab = JupyterLab(
     name=f"jupyterlab-{user_name}",
     image_name=prd_jupyter_image.name,
     image_tag=prd_jupyter_image.tag,
@@ -66,8 +75,8 @@ prd_jupyter = JupyterLab(
     topology_spread_when_unsatisfiable=topology_spread_when_unsatisfiable,
 )
 
-prd_jupyter_apps = AppGroup(
+prd_jupyterlab_apps = AppGroup(
     name=f"jupyterlab-{user_name}",
     enabled=jupyter_enabled,
-    apps=[prd_jupyter],
+    apps=[prd_jupyterlab],
 )
