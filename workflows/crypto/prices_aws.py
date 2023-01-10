@@ -1,6 +1,7 @@
 from typing import Dict
 
 from phidata.asset.table.s3.parquet import ParquetTable
+from phidata.check.df.not_empty import DFNotEmpty
 from phidata.task import TaskArgs, task
 from phidata.utils.log import logger
 from phidata.workflow import Workflow
@@ -12,10 +13,11 @@ from workflows.buckets import DATA_S3_BUCKET
 ##############################################################################
 
 # Step 1: Define ParquetTable on S3 for storing data
-crypto_prices_daily_s3 = ParquetTable(
-    name="crypto_prices_daily",
+crypto_prices_s3 = ParquetTable(
+    name="crypto_prices",
     bucket=DATA_S3_BUCKET,
     partitions=["ds", "hour"],
+    write_checks=[DFNotEmpty()],
 )
 
 
@@ -47,7 +49,7 @@ def load_crypto_prices(**kwargs) -> bool:
     ).json()
 
     # Create a dataframe from response
-    df = pl.DataFrame(
+    df: pl.DataFrame = pl.DataFrame(
         [
             {
                 "ds": run_day,
@@ -65,16 +67,43 @@ def load_crypto_prices(**kwargs) -> bool:
     logger.info(df.head())
 
     # Write the dataframe to s3
-    return crypto_prices_daily_s3.write_df(df)
+    return crypto_prices_s3.write_df(df)
 
 
-# Step 3: Instantiate the task
-download_prices = load_crypto_prices()
+# 2.2: Create task to analyze ParquetTable
+@task
+def analyze_crypto_prices(**kwargs) -> bool:
+    """
+    Read ParquetTable from S3.
+    """
+    import polars as pl
+
+    run_date = TaskArgs.from_kwargs(kwargs).run_date
+    run_day = run_date.strftime("%Y-%m-%d")
+    run_hour = run_date.strftime("%H")
+
+    logger.info(f"Reading prices for ds={run_day}/hr={run_hour}")
+    df: pl.DataFrame = crypto_prices_s3.read_df()
+    logger.info(df.head())
+
+    return True
+
+
+# Step 3: Instantiate the tasks
+load_prices = load_crypto_prices()
+analyze_prices = analyze_crypto_prices()
 
 # Step 4: Create a Workflow to run these tasks
-crypto_prices_daily = Workflow(
-    name="crypto_prices_daily_aws",
-    tasks=[download_prices],
+crypto_prices_aws = Workflow(
+    name="crypto_prices_aws",
+    tasks=[load_prices, analyze_prices],
+    # the graph orders analyze_prices to run after load_prices
+    graph={
+        analyze_prices: [load_prices],
+    },
     # the output of this workflow
-    outputs=[crypto_prices_daily_s3],
+    outputs=[crypto_prices_s3],
 )
+
+# Step 5: Create a DAG to run the workflow on a schedule
+dag = crypto_prices_aws.create_airflow_dag(schedule_interval="@hourly")
