@@ -37,8 +37,8 @@ numpy==1.24.1
 oauthlib==3.2.2
 packaging==23.0
 pathspec==0.9.0
-phidata==1.0.0.dev3
-phiterm==1.0.0.dev3
+phidata==1.0.0.dev4
+phiterm==1.0.0.dev4
 platformdirs==2.6.2
 pluggy==1.0.0
 polars==0.15.14
