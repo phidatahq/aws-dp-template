@@ -16,7 +16,7 @@ from workflows.buckets import DATA_S3_BUCKET
 crypto_prices_s3 = ParquetTable(
     name="crypto_prices",
     bucket=DATA_S3_BUCKET,
-    partitions=["ds", "hour"],
+    partitions=["ds", "hr"],
     write_checks=[DFNotEmpty()],
 )
 
@@ -53,7 +53,7 @@ def load_crypto_prices(**kwargs) -> bool:
         [
             {
                 "ds": run_day,
-                "hour": run_hour,
+                "hr": run_hour,
                 "ticker": coin_name,
                 "usd": coin_data["usd"],
                 "usd_market_cap": coin_data["usd_market_cap"],
@@ -77,13 +77,17 @@ def analyze_crypto_prices(**kwargs) -> bool:
     Read ParquetTable from S3.
     """
     import polars as pl
+    import pyarrow.dataset as ds
 
     run_date = TaskArgs.from_kwargs(kwargs).run_date
     run_day = run_date.strftime("%Y-%m-%d")
     run_hour = run_date.strftime("%H")
 
     logger.info(f"Reading prices for ds={run_day}/hr={run_hour}")
-    df: pl.DataFrame = crypto_prices_s3.read_df()
+    # https://arrow.apache.org/docs/python/dataset.html#filtering-data
+    df: pl.DataFrame = crypto_prices_s3.read_df(
+        filter=((ds.field("ds") == run_day) & (ds.field("hr") == int(run_hour)))
+    )
     logger.info(df.head())
 
     return True
@@ -97,11 +101,6 @@ analyze_prices = analyze_crypto_prices()
 crypto_prices_aws = Workflow(
     name="crypto_prices_aws",
     tasks=[load_prices, analyze_prices],
-    # the graph orders analyze_prices to run after load_prices
-    graph={
-        analyze_prices: [load_prices],
-    },
-    # the output of this workflow
     outputs=[crypto_prices_s3],
 )
 

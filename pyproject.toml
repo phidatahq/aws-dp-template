@@ -67,11 +67,9 @@ exclude = [
 
 [[tool.mypy.overrides]]
 module = [
-  "airflow",
   "airflow.*",
-  "phidata",
   "phidata.*",
-  "setuptools",
+  "pyarrow.*",
   "setuptools.*",
 ]
 ignore_missing_imports = true
