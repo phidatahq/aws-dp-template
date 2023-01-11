@@ -10,7 +10,7 @@ authors = [
 dependencies = [
   "black",
   "mypy",
-  "phidata==1.0.0.dev1",
+  "phidata==1.0.0.dev3",
   "pre-commit",
   "pytest",
   "ruff",
