@@ -1,4 +1,4 @@
-from phidata.infra.docker.config import DockerConfig
+from phidata.docker.config import DockerConfig
 
 from workspace.prd.images import prd_images
 from workspace.settings import ws_settings

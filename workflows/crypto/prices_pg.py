@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 
-from phidata.asset.table.sql.postgres import PostgresTable
+from phidata.table.sql.postgres import PostgresTable
 from phidata.task import TaskArgs, task
 from phidata.utils.log import logger
 from phidata.workflow import Workflow
@@ -117,9 +117,16 @@ drop_prices = drop_existing_prices(enabled=False)
 
 # Step 4: Create a Workflow to run these tasks
 crypto_prices = Workflow(
-    name="crypto_prices",
+    name="crypto_prices_pg",
     tasks=[drop_prices, load_prices],
     outputs=[crypto_prices_table],
+    # Airflow tasks created by this workflow are ordered using the graph param
+    # graph = { downstream: [upstream_list] }
+    # The downstream task will run after tasks in the upstream_list
+    # To run download_prices after drop_prices:
+    graph={
+        load_prices: [drop_prices],
+    },
 )
 
 # Step 5: Create a DAG to run the workflow on a schedule

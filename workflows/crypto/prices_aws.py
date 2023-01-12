@@ -1,7 +1,8 @@
+import os
 from typing import Dict
 
-from phidata.asset.table.s3.parquet import ParquetTable
-from phidata.check.df.not_empty import DFNotEmpty
+from phidata.table.s3.parquet import ParquetTable
+from phidata.checks.not_empty import NotEmpty
 from phidata.task import TaskArgs, task
 from phidata.utils.log import logger
 from phidata.workflow import Workflow
@@ -17,7 +18,7 @@ crypto_prices_s3 = ParquetTable(
     name="crypto_prices",
     bucket=DATA_S3_BUCKET,
     partitions=["ds", "hr"],
-    write_checks=[DFNotEmpty()],
+    write_checks=[NotEmpty()],
 )
 
 
@@ -29,6 +30,8 @@ def load_crypto_prices(**kwargs) -> bool:
     """
     import httpx
     import polars as pl
+
+    os.environ["NO_PROXY"] = "URL"
 
     coins = ["bitcoin", "ethereum", "litecoin", "ripple", "tether"]
     run_date = TaskArgs.from_kwargs(kwargs).run_date
@@ -70,7 +73,7 @@ def load_crypto_prices(**kwargs) -> bool:
     return crypto_prices_s3.write_df(df)
 
 
-# 2.2: Create task to analyze ParquetTable
+# 2.2: Create task to analyze data in ParquetTable
 @task
 def analyze_crypto_prices(**kwargs) -> bool:
     """
@@ -78,6 +81,8 @@ def analyze_crypto_prices(**kwargs) -> bool:
     """
     import polars as pl
     import pyarrow.dataset as ds
+
+    os.environ["NO_PROXY"] = "URL"
 
     run_date = TaskArgs.from_kwargs(kwargs).run_date
     run_day = run_date.strftime("%Y-%m-%d")
@@ -102,6 +107,13 @@ crypto_prices_aws = Workflow(
     name="crypto_prices_aws",
     tasks=[load_prices, analyze_prices],
     outputs=[crypto_prices_s3],
+    # Airflow tasks created by this workflow are ordered using the graph param
+    # graph = { downstream: [upstream_list] }
+    # The downstream task will run after tasks in the upstream_list
+    # To run download_prices after drop_prices:
+    graph={
+        analyze_prices: [load_prices],
+    },
 )
 
 # Step 5: Create a DAG to run the workflow on a schedule

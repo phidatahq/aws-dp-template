@@ -1,4 +1,4 @@
-from phidata.infra.docker.config import DockerConfig
+from phidata.docker.config import DockerConfig
 
 from workspace.dev.airflow.docker_resources import dev_airflow_apps
 from workspace.dev.images import dev_images

@@ -1,5 +1,5 @@
-from phidata.infra.aws.config import AwsResourceGroup
-from phidata.infra.aws.resource.s3.bucket import S3Bucket
+from phidata.aws.config import AwsResourceGroup
+from phidata.aws.resource.s3.bucket import S3Bucket
 
 from workspace.settings import ws_settings
 

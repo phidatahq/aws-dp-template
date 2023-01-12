@@ -31,7 +31,7 @@ jobs:
           file: workspace/prd/images/airflow.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKERHUB_REPO }}/airflow-dp:prd
+          tags: ${{ secrets.DOCKERHUB_REPO }}/airflow-aws-dp:prd
 
   build-superset-image:
 
@@ -56,7 +56,7 @@ jobs:
           file: workspace/prd/images/superset.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKERHUB_REPO }}/superset-dp:prd
+          tags: ${{ secrets.DOCKERHUB_REPO }}/superset-aws-dp:prd
 
   build-jupyter-image:
 
@@ -81,4 +81,4 @@ jobs:
           file: workspace/prd/images/jupyter.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.DOCKERHUB_REPO }}/jupyter-dp:prd
+          tags: ${{ secrets.DOCKERHUB_REPO }}/jupyter-aws-dp:prd

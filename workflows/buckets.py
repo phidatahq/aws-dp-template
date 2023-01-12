@@ -1,4 +1,4 @@
-from phidata.infra.aws.resource.s3.bucket import S3Bucket
+from phidata.aws.resource.s3.bucket import S3Bucket
 
 from workflows.env import AIRFLOW_ENV
 from workspace.dev.aws_resources import dev_data_s3_bucket, dev_logs_s3_bucket

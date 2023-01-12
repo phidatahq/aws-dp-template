@@ -1,4 +1,4 @@
-from phidata.infra.k8s.config import K8sConfig
+from phidata.k8s.config import K8sConfig
 
 from workspace.k8s.whoami import whoami_k8s_rg
 from workspace.prd.airflow.k8s_apps import prd_airflow_apps

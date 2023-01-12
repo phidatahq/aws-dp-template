@@ -1,4 +1,4 @@
-from phidata.infra.docker.resource.image import DockerImage
+from phidata.docker.resource.image import DockerImage
 
 from workspace.settings import ws_settings
 

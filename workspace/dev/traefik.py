@@ -1,5 +1,5 @@
-from phidata.infra.docker.resource.container import DockerContainer
-from phidata.infra.docker.resource.group import DockerResourceGroup
+from phidata.docker.resource.container import DockerContainer
+from phidata.docker.resource.group import DockerResourceGroup
 
 from workspace.settings import ws_settings
 

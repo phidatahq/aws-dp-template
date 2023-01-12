@@ -1,4 +1,4 @@
-from phidata.infra.aws.config import AwsConfig
+from phidata.aws.config import AwsConfig
 
 from workspace.dev.aws_resources import dev_aws_resources
 from workspace.settings import ws_settings

@@ -1,9 +1,10 @@
 from typing import Dict
 
-from phidata.asset.table.local.csv import CsvTable
-from phidata.check.df.not_empty import DFNotEmpty
+from phidata.table.local.csv import CsvTableLocal
+from phidata.checks.not_empty import NotEmpty
 from phidata.task import TaskArgs, task
 from phidata.utils.log import logger
+from phidata.utils.print_table import print_table
 from phidata.workflow import Workflow
 
 ##############################################################################
@@ -12,11 +13,11 @@ from phidata.workflow import Workflow
 
 # Step 1: Define CsvTable for storing data
 # Path: `storage/tables/crypto_prices`
-crypto_prices_local = CsvTable(
+crypto_prices_local = CsvTableLocal(
     name="crypto_prices",
     database="crypto",
     partitions=["ds"],
-    write_checks=[DFNotEmpty()],
+    write_checks=[NotEmpty()],
 )
 
 
@@ -27,7 +28,7 @@ def load_crypto_prices(**kwargs) -> bool:
     Download prices and load a CsvTable.
     """
     import httpx
-    import polars as pl
+    import pyarrow as pa
 
     coins = ["bitcoin", "ethereum"]
     run_date = TaskArgs.from_kwargs(kwargs).run_date
@@ -46,13 +47,14 @@ def load_crypto_prices(**kwargs) -> bool:
         },
     ).json()
 
-    # Create a dataframe from the response
-    df: pl.DataFrame = pl.DataFrame(
+    # Create pyarrow.Table
+    # https://arrow.apache.org/docs/python/generated/pyarrow.Table.html#pyarrow.Table.from_pylist
+    table = pa.Table.from_pylist(
         [
             {
                 "ds": run_day,
                 "ticker": coin_name,
-                "usd:": coin_data["usd"],
+                "usd": coin_data["usd"],
                 "usd_market_cap": coin_data["usd_market_cap"],
                 "usd_24h_vol": coin_data["usd_24h_vol"],
                 "usd_24h_change": coin_data["usd_24h_change"],
@@ -61,27 +63,38 @@ def load_crypto_prices(**kwargs) -> bool:
             for coin_name, coin_data in response.items()
         ]
     )
-    logger.info(df.head())
 
-    # Write the dataframe locally
-    return crypto_prices_local.write_df(df)
+    # Write table to disk
+    return crypto_prices_local.write_table(table)
 
 
-# 2.2: Create a task to analyze CsvTable
+# 2.2: Create a task to analyze data in CsvTable
 @task
 def analyze_crypto_prices(**kwargs) -> bool:
     """
     Read CsvTable
     """
-    import polars as pl
+    import pyarrow as pa
     import pyarrow.dataset as ds
 
     run_date = TaskArgs.from_kwargs(kwargs).run_date
     run_day = run_date.strftime("%Y-%m-%d")
 
-    logger.info(f"Reading prices for ds={run_day}")
-    df: pl.DataFrame = crypto_prices_local.read_df(filter=(ds.field("ds") == run_day))
-    logger.info(df.head())
+    logger.info(f"Reading prices for ds={run_day}\n")
+    table: pa.Table = crypto_prices_local.read_table(filter=(ds.field("ds") == run_day))
+    print_table(
+        title="Crypto Prices", header=table.column_names, rows=table.to_pylist()
+    )
+
+    # Use polars to analyze data
+    # import polars as pl
+    # df: pl.DataFrame = pl.DataFrame(table)
+    # logger.info(df)
+
+    # Use pandas to analyze data
+    # import pandas as pd
+    # df: pd.DataFrame = table.to_pandas()
+    # logger.info(df)
 
     return True
 

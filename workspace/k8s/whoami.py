@@ -1,8 +1,8 @@
-from phidata.infra.k8s.create.apps.v1.deployment import CreateDeployment
-from phidata.infra.k8s.create.common.port import CreatePort
-from phidata.infra.k8s.create.core.v1.container import CreateContainer
-from phidata.infra.k8s.create.core.v1.service import CreateService
-from phidata.infra.k8s.create.group import CreateK8sResourceGroup
+from phidata.k8s.create.apps.v1.deployment import CreateDeployment
+from phidata.k8s.create.common.port import CreatePort
+from phidata.k8s.create.core.v1.container import CreateContainer
+from phidata.k8s.create.core.v1.service import CreateService
+from phidata.k8s.create.group import CreateK8sResourceGroup
 from phidata.utils.common import (
     get_default_container_name,
     get_default_deploy_name,

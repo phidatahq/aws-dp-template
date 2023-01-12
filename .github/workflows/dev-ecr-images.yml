@@ -38,7 +38,7 @@ jobs:
           file: workspace/dev/images/airflow.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.ECR_REPO }}/airflow-dp:dev
+          tags: ${{ secrets.ECR_REPO }}/airflow-aws-dp:dev
 
   build-superset-image:
 
@@ -72,7 +72,7 @@ jobs:
           file: workspace/dev/images/superset.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.ECR_REPO }}/superset-dp:dev
+          tags: ${{ secrets.ECR_REPO }}/superset-aws-dp:dev
 
   build-jupyter-image:
 
@@ -106,4 +106,4 @@ jobs:
           file: workspace/dev/images/jupyter.Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: ${{ secrets.ECR_REPO }}/jupyter-dp:dev
+          tags: ${{ secrets.ECR_REPO }}/jupyter-aws-dp:dev

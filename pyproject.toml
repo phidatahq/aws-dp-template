@@ -8,12 +8,22 @@ authors = [
 ]
 
 dependencies = [
+  # Formatting
   "black",
+  # Type checking
   "mypy",
-  "phidata==1.0.0.dev4",
+  # Pre-commit hooks
   "pre-commit",
+  # Testing
   "pytest",
+  # Linting
   "ruff",
+  "phidata==1.0.0.dev5",
+  # Dataframe libraries
+  "pandas",
+  "polars",
+  # AWS libraries
+  "awswrangler",
   # For Airflow 2.5.0 compatibility
   "pathspec~=0.9.0",
 ]

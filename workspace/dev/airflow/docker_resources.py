@@ -55,7 +55,7 @@ dev_airflow_env: Dict[str, str] = {
     "AWS_DEFAULT_REGION": ws_settings.aws_region,
     "AIRFLOW_CONN_AWS_DEFAULT": "aws://",
     # Airflow Navbar color
-    "AIRFLOW__WEBSERVER__NAVBAR_COLOR": "#bbf7d0",
+    "AIRFLOW__WEBSERVER__NAVBAR_COLOR": "#d1fae5",
 }
 
 # -*- Airflow webserver
@@ -139,8 +139,8 @@ dev_airflow_apps = AppGroup(
     apps=[
         dev_airflow_db,
         dev_airflow_redis,
-        dev_airflow_ws,
         dev_airflow_scheduler,
+        dev_airflow_ws,
         dev_airflow_worker,
     ],
 )

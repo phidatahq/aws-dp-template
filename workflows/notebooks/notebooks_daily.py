@@ -5,7 +5,7 @@ from airflow.providers.papermill.operators.papermill import PapermillOperator
 from airflow.utils.dates import days_ago
 
 DAG_ID = "notebooks_daily"
-EMAILS = ["alerts@datateam.co"]
+EMAILS = ["alerts@datateam.com"]
 
 default_task_args = {
     "owner": "airflow",

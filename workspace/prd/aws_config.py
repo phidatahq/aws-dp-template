@@ -1,4 +1,4 @@
-from phidata.infra.aws.config import AwsConfig
+from phidata.aws.config import AwsConfig
 
 from workspace.prd.airflow.aws_resources import prd_airflow_aws_resources
 from workspace.prd.aws_resources import prd_aws_resources

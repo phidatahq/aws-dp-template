@@ -10,22 +10,22 @@ docker exec -it airflow-worker-container zsh
 airflow dags list
 
 # List tasks
-airflow tasks list -t crypto_prices
+airflow tasks list -t crypto_prices_aws
 
 # Test tasks
 airflow tasks test \
-  crypto_prices \
-  load_crypto_prices \
-  2022-07-01
+  crypto_prices_aws \
+  analyze_prices \
+  2023-01-10
 
 airflow tasks test \
-  crypto_prices \
+  crypto_prices_aws \
   drop_existing_prices \
-  2022-07-01
+  2023-01-10
 
 # Test tasks for ds + hour
 airflow tasks test \
-  crypto_prices \
-  load_crypto_prices \
-  2022-07-01T01:05:00
+  crypto_prices_aws \
+  analyze_prices \
+  2023-01-10T01
 ```

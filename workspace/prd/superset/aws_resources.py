@@ -1,4 +1,4 @@
-from phidata.infra.aws.resource.group import (
+from phidata.aws.resource.group import (
     AwsResourceGroup,
     CacheCluster,
     CacheSubnetGroup,
