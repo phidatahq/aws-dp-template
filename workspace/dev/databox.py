@@ -1,7 +1,11 @@
 from phidata.app.databox import Databox
-from phidata.app.group import AppGroup
+from phidata.docker.resource.image import DockerImage
 
-from workspace.dev.images import dev_databox_image
+from workspace.dev.airflow.docker_resources import (
+    dev_airflow_env_file,
+    dev_airflow_secrets_file,
+    dev_airflow_env,
+)
 from workspace.dev.postgres import dev_postgres_airflow_connections
 from workspace.settings import ws_settings
 
@@ -9,23 +13,27 @@ from workspace.settings import ws_settings
 # -*- Databox Docker resources
 #
 
-# -*- Databox
+# -*- Databox image
+dev_databox_image = DockerImage(
+    name=f"{ws_settings.image_repo}/databox-{ws_settings.image_suffix}",
+    tag=ws_settings.dev_env,
+    enabled=ws_settings.build_images,
+    path=str(ws_settings.ws_dir.parent),
+    dockerfile="workspace/dev/images/databox.Dockerfile",
+    pull=ws_settings.pull_docker_images,
+    push_image=ws_settings.push_docker_images,
+    skip_docker_cache=ws_settings.skip_docker_cache,
+    use_cache=ws_settings.use_cache,
+)
+
+# Databox
 dev_databox = Databox(
-    image_name=dev_databox_image.name,
-    image_tag=dev_databox_image.tag,
+    enabled=ws_settings.dev_databox_enabled,
+    image=dev_databox_image,
     mount_workspace=True,
-    env={
-        "AIRFLOW__WEBSERVER__EXPOSE_CONFIG": "True",
-        "AIRFLOW__WEBSERVER__EXPOSE_HOSTNAME": "True",
-        "AIRFLOW__WEBSERVER__EXPOSE_STACKTRACE": "True",
-        # Create aws_default connection_id
-        "AWS_DEFAULT_REGION": ws_settings.aws_region,
-        "AIRFLOW_CONN_AWS_DEFAULT": "aws://",
-        # Airflow Navbar color
-        "AIRFLOW__WEBSERVER__NAVBAR_COLOR": "#cffafe",
-    },
-    env_file=ws_settings.ws_dir.joinpath("env/dev_airflow_env.yml"),
-    secrets_file=ws_settings.ws_dir.joinpath("secrets/dev_airflow_secrets.yml"),
+    env=dev_airflow_env,
+    env_file=dev_airflow_env_file,
+    secrets_file=dev_airflow_secrets_file,
     use_cache=ws_settings.use_cache,
     db_connections=dev_postgres_airflow_connections,
     # Access the databox airflow webserver on http://localhost:8390
@@ -45,10 +53,4 @@ dev_databox = Databox(
         # point the traefik loadbalancer to the webserver_port on the container
         "traefik.http.services.databox.loadbalancer.server.port": "8080",
     },
-)
-
-dev_databox_apps = AppGroup(
-    name="databox",
-    enabled=ws_settings.dev_databox_enabled,
-    apps=[dev_databox],
 )

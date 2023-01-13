@@ -4,8 +4,8 @@ from phidata.app.group import AppGroup
 from phidata.app.postgres import PostgresDb
 from phidata.app.redis import Redis
 from phidata.app.superset import SupersetInit, SupersetWebserver
+from phidata.docker.resource.image import DockerImage
 
-from workspace.dev.images import dev_superset_image
 from workspace.settings import ws_settings
 
 #
@@ -44,10 +44,22 @@ dev_superset_secrets_file: Path = ws_settings.ws_dir.joinpath(
     "secrets/dev_superset_secrets.yml"
 )
 
+# -*- Superset image
+dev_superset_image = DockerImage(
+    name=f"{ws_settings.image_repo}/superset-{ws_settings.image_suffix}",
+    tag=ws_settings.dev_env,
+    enabled=ws_settings.build_images,
+    path=str(ws_settings.ws_dir.parent),
+    dockerfile="workspace/dev/images/superset.Dockerfile",
+    pull=ws_settings.pull_docker_images,
+    push_image=ws_settings.push_docker_images,
+    skip_docker_cache=ws_settings.skip_docker_cache,
+    use_cache=ws_settings.use_cache,
+)
+
 # Superset webserver
 dev_superset_ws = SupersetWebserver(
-    image_name=dev_superset_image.name,
-    image_tag=dev_superset_image.tag,
+    image=dev_superset_image,
     db_app=dev_superset_db,
     wait_for_db=wait_for_db,
     redis_app=dev_superset_redis,
@@ -70,11 +82,9 @@ dev_superset_ws = SupersetWebserver(
 )
 
 # Superset init
-superset_init_enabled = True  # Mark as False after first run
 dev_superset_init = SupersetInit(
-    enabled=superset_init_enabled,
-    image_name=dev_superset_image.name,
-    image_tag=dev_superset_image.tag,
+    enabled=True,  # Mark as False after first run
+    image=dev_superset_image,
     db_app=dev_superset_db,
     wait_for_db=wait_for_db,
     redis_app=dev_superset_redis,

@@ -22,6 +22,8 @@ dependencies = [
   # Dataframe libraries
   "pandas",
   "polars",
+  # Sql libraries
+  "sqlmodel",
   # AWS libraries
   # "awswrangler",
   # Other libraries

@@ -5,8 +5,8 @@ from phidata.app.airflow import AirflowScheduler, AirflowWebserver, AirflowWorke
 from phidata.app.group import AppGroup
 from phidata.app.postgres import PostgresDb
 from phidata.app.redis import Redis
+from phidata.docker.resource.image import DockerImage
 
-from workspace.dev.images import dev_airflow_image
 from workspace.dev.postgres import dev_postgres_airflow_connections
 from workspace.settings import ws_settings
 
@@ -58,10 +58,22 @@ dev_airflow_env: Dict[str, str] = {
     "AIRFLOW__WEBSERVER__NAVBAR_COLOR": "#d1fae5",
 }
 
+# -*- Airflow image
+dev_airflow_image = DockerImage(
+    name=f"{ws_settings.image_repo}/airflow-{ws_settings.image_suffix}",
+    tag=ws_settings.dev_env,
+    enabled=ws_settings.build_images,
+    path=str(ws_settings.ws_dir.parent),
+    dockerfile="workspace/dev/images/airflow.Dockerfile",
+    pull=ws_settings.pull_docker_images,
+    push_image=ws_settings.push_docker_images,
+    skip_docker_cache=ws_settings.skip_docker_cache,
+    use_cache=ws_settings.use_cache,
+)
+
 # -*- Airflow webserver
 dev_airflow_ws = AirflowWebserver(
-    image_name=dev_airflow_image.name,
-    image_tag=dev_airflow_image.tag,
+    image=dev_airflow_image,
     db_app=dev_airflow_db,
     wait_for_db=wait_for_db,
     redis_app=dev_airflow_redis,
@@ -90,8 +102,7 @@ dev_airflow_ws = AirflowWebserver(
 
 # -*- Airflow scheduler
 dev_airflow_scheduler = AirflowScheduler(
-    image_name=dev_airflow_image.name,
-    image_tag=dev_airflow_image.tag,
+    image=dev_airflow_image,
     db_app=dev_airflow_db,
     wait_for_db=wait_for_db,
     redis_app=dev_airflow_redis,
@@ -115,8 +126,7 @@ dev_airflow_scheduler = AirflowScheduler(
 # -*- Airflow worker serving the default & tier_1 workflows
 dev_airflow_worker = AirflowWorker(
     queue_name="default,tier_1",
-    image_name=dev_airflow_image.name,
-    image_tag=dev_airflow_image.tag,
+    image=dev_airflow_image,
     db_app=dev_airflow_db,
     wait_for_db=wait_for_db,
     redis_app=dev_airflow_redis,
