@@ -18,12 +18,12 @@ dependencies = [
   "pytest",
   # Linting
   "ruff",
-  "phidata==1.0.0.dev5",
+  "phidata==1.0.0.dev6",
   # Dataframe libraries
-  "pandas",
-  "polars",
+  # "pandas",
+  # "polars",
   # AWS libraries
-  "awswrangler",
+  # "awswrangler",
   # For Airflow 2.5.0 compatibility
   "pathspec~=0.9.0",
 ]
