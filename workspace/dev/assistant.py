@@ -7,5 +7,7 @@ from workspace.settings import ws_settings
 #
 
 dev_assistant = Assistant(
-    enabled=ws_settings.dev_assistant_enabled, container_host_port=9090
+    runtime=ws_settings.dev_env,
+    enabled=ws_settings.dev_assistant_enabled,
+    container_host_port=9090,
 )

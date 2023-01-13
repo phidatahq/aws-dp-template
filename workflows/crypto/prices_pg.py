@@ -33,7 +33,7 @@ class CryptoPrices(SQLModel, table=True):
 # 1.2 Define a PostgresTable object for the table
 crypto_prices_table = PostgresTable(
     name=CryptoPrices.__tablename__,
-    sql_model=CryptoPrices,
+    data_model=CryptoPrices,
     db_app=POSTGRES_APP,
     airflow_conn_id=POSTGRES_CONN_ID,
 )

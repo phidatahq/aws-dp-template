@@ -20,10 +20,12 @@ dependencies = [
   "ruff",
   "phidata==1.0.0.dev6",
   # Dataframe libraries
-  # "pandas",
-  # "polars",
+  "pandas",
+  "polars",
   # AWS libraries
   # "awswrangler",
+  # Other libraries
+  "httpx",
   # For Airflow 2.5.0 compatibility
   "pathspec~=0.9.0",
 ]
@@ -53,6 +55,8 @@ exclude = [
   "dpenvdev*",
   "workspace/dev/airflow/resources/*",
   "workspace/prd/airflow/resources/*",
+  "workspace/dev/databox/resources/*",
+  "workspace/prd/databox/resources/*",
   "workspace/dev/superset/resources/*",
   "workspace/prd/superset/resources/*",
   "workspace/dev/jupyter/resources/*",
@@ -69,6 +73,8 @@ exclude = [
   "dpenvdev*",
   "workspace/dev/airflow/resources/*",
   "workspace/prd/airflow/resources/*",
+  "workspace/dev/databox/resources/*",
+  "workspace/prd/databox/resources/*",
   "workspace/dev/superset/resources/*",
   "workspace/prd/superset/resources/*",
   "workspace/dev/jupyter/resources/*",
