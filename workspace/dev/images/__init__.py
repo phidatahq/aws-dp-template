@@ -54,3 +54,18 @@ dev_superset_image = DockerImage(
 
 if ws_settings.dev_superset_enabled and ws_settings.build_images:
     dev_images.append(dev_superset_image)
+
+# -*- Databox image
+dev_databox_image = DockerImage(
+    name=f"{ws_settings.image_repo}/databox-{ws_settings.image_suffix}",
+    tag=image_tag,
+    path=str(ws_settings.ws_dir.parent),
+    dockerfile="workspace/dev/images/databox.Dockerfile",
+    pull=ws_settings.pull_docker_images,
+    push_image=ws_settings.push_docker_images,
+    skip_docker_cache=ws_settings.skip_docker_cache,
+    use_cache=ws_settings.use_cache,
+)
+
+if ws_settings.dev_databox_enabled and ws_settings.build_images:
+    dev_images.append(dev_databox_image)

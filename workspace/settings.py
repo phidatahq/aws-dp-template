@@ -15,23 +15,25 @@ ws_settings = WorkspaceSettings(
     # -*- Dev settings
     dev_env="dev",
     # -*- Dev Apps
-    dev_postgres_enabled=True,
     dev_airflow_enabled=True,
-    dev_superset_enabled=True,
+    dev_assistant_enabled=True,
+    dev_databox_enabled=True,
     dev_jupyter_enabled=True,
+    dev_postgres_enabled=True,
+    dev_superset_enabled=True,
     dev_traefik_enabled=True,
-    dev_monitor_enabled=True,
     # -*- Production settings
     prd_env="prd",
     # Domain for the production platform
     prd_domain="dp001.xyz",
     # -*- Production Apps
-    prd_postgres_enabled=True,
     prd_airflow_enabled=True,
-    prd_superset_enabled=True,
+    prd_assistant_enabled=True,
+    prd_databox_enabled=True,
     prd_jupyter_enabled=True,
+    prd_postgres_enabled=True,
+    prd_superset_enabled=True,
     prd_traefik_enabled=True,
-    prd_monitor_enabled=True,
     prd_whoami_enabled=True,
     # -*- AWS settings
     # Region for AWS resources
@@ -47,7 +49,7 @@ ws_settings = WorkspaceSettings(
     # Repository for images
     image_repo="phidata",
     # Suffix added to the image name
-    image_suffix="dp",
+    image_suffix="aws-dp",
     # Build images locally
     build_images=True,
     # Push images after building
