@@ -7,13 +7,11 @@ from workspace.settings import ws_settings
 #
 
 prd_images = []
-# Production image tag
-image_tag = "prd"
 
 # -*- Airflow image
 prd_airflow_image = DockerImage(
     name=f"{ws_settings.image_repo}/airflow-{ws_settings.image_suffix}",
-    tag=image_tag,
+    tag=ws_settings.prd_env,
     path=str(ws_settings.ws_dir.parent),
     dockerfile="workspace/prd/images/airflow.Dockerfile",
     pull=ws_settings.pull_docker_images,
@@ -28,7 +26,7 @@ if ws_settings.prd_airflow_enabled and ws_settings.build_images:
 # -*- Jupyter image
 prd_jupyter_image = DockerImage(
     name=f"{ws_settings.image_repo}/jupyter-{ws_settings.image_suffix}",
-    tag=image_tag,
+    tag=ws_settings.prd_env,
     path=str(ws_settings.ws_dir.parent),
     dockerfile="workspace/prd/images/jupyter.Dockerfile",
     pull=ws_settings.pull_docker_images,
@@ -43,7 +41,7 @@ if ws_settings.prd_jupyter_enabled and ws_settings.build_images:
 # -*- Superset image
 prd_superset_image = DockerImage(
     name=f"{ws_settings.image_repo}/superset-{ws_settings.image_suffix}",
-    tag=image_tag,
+    tag=ws_settings.prd_env,
     path=str(ws_settings.ws_dir.parent),
     dockerfile="workspace/prd/images/superset.Dockerfile",
     pull=ws_settings.pull_docker_images,
