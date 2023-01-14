@@ -15,13 +15,13 @@ ws_settings = WorkspaceSettings(
     # -*- Dev settings
     dev_env="dev",
     # -*- Dev Apps
-    dev_airflow_enabled=True,
-    dev_assistant_enabled=True,
-    dev_databox_enabled=True,
+    dev_airflow_enabled=False,
+    dev_assistant_enabled=False,
+    dev_databox_enabled=False,
     dev_jupyter_enabled=True,
-    dev_postgres_enabled=True,
-    dev_superset_enabled=True,
-    dev_traefik_enabled=True,
+    dev_postgres_enabled=False,
+    dev_superset_enabled=False,
+    dev_traefik_enabled=False,
     # -*- Production settings
     prd_env="prd",
     # Production branch: used for git-sync
@@ -30,8 +30,8 @@ ws_settings = WorkspaceSettings(
     prd_domain="dp001.xyz",
     # -*- Production Apps
     prd_airflow_enabled=True,
-    prd_assistant_enabled=True,
-    prd_databox_enabled=True,
+    prd_assistant_enabled=False,
+    prd_databox_enabled=False,
     prd_jupyter_enabled=True,
     prd_postgres_enabled=True,
     prd_superset_enabled=True,
