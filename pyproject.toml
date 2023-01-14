@@ -52,11 +52,11 @@ workspace = ["secrets"]
 
 [tool.ruff]
 line-length = 110
-# Ignore `F401` (unused imports).
-ignore = ["F401"]
 exclude = [
   "dpenv*",
   "dpenvdev*",
+  "notebooks/examples/*",
+  "workflows/crypto/*",
   "workspace/dev/airflow/resources/*",
   "workspace/prd/airflow/resources/*",
   "workspace/dev/databox/resources/*",
@@ -75,6 +75,8 @@ warn_unused_configs = true
 exclude = [
   "dpenv*",
   "dpenvdev*",
+  "notebooks/examples/*",
+  "workflows/crypto/*",
   "workspace/dev/airflow/resources/*",
   "workspace/prd/airflow/resources/*",
   "workspace/dev/databox/resources/*",
