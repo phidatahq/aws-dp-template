@@ -24,6 +24,8 @@ dependencies = [
   "polars",
   # Sql libraries
   "sqlmodel",
+  # For Postgres
+  # "psycopg2-binary",
   # AWS libraries
   # "awswrangler",
   # Other libraries
