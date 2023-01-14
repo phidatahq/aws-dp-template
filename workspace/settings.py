@@ -24,6 +24,8 @@ ws_settings = WorkspaceSettings(
     dev_traefik_enabled=True,
     # -*- Production settings
     prd_env="prd",
+    # Production branch: used for git-sync
+    # prd_branch: str = "main",
     # Domain for the production platform
     prd_domain="dp001.xyz",
     # -*- Production Apps
