@@ -18,13 +18,13 @@ dependencies = [
   "pytest",
   # Linting
   "ruff",
-  "phidata==1.0.0.dev6",
+  "phidata>=1.0.0",
   # Dataframe libraries
-  "pandas",
-  "polars",
+  # "pandas",
+  # "polars",
   # Sql libraries
-  "sqlmodel",
-  # For Postgres
+  # "sqlmodel",
+  # Postgres libraries
   # "psycopg2-binary",
   # AWS libraries
   # "awswrangler",
