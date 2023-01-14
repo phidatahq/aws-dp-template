@@ -51,7 +51,7 @@ ws_settings = WorkspaceSettings(
     # Repository for images
     # image_repo="your-repo",
     # Suffix added to the image name
-    # image_suffix="aws-dp",
+    image_suffix="aws-dp",
     # Build images locally
     # build_images=True,
     # Push images after building
