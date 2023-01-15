@@ -162,4 +162,4 @@ crypto_prices = Workflow(
 )
 
 # Step 5: Create a DAG to run the workflow on a schedule
-dag = crypto_prices.create_airflow_dag()
+# dag = crypto_prices.create_airflow_dag()
