@@ -16,7 +16,7 @@ from workspace.settings import ws_settings
 #
 prd_k8s_config = K8sConfig(
     env=ws_settings.prd_env,
-    app=[prd_assistant, prd_databox],
+    apps=[prd_assistant, prd_databox],
     app_groups=[
         prd_airflow_apps,
         prd_superset_apps,
