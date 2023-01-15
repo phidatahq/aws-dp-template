@@ -22,7 +22,7 @@ skip_delete: bool = False
 # Wait for the resource to be created
 wait_for_create: bool = True
 # Wait for the resource to be deleted
-wait_for_delete: bool = False
+wait_for_delete: bool = True
 
 # -*- S3 buckets
 # S3 bucket for storing logs
@@ -74,7 +74,7 @@ prd_eks_cluster = EksCluster(
     # Uncomment the line below and comment out the vpc_stack line below
     # resources_vpc_config={
     #     "subnetIds": ws_settings.subnet_ids,
-    #     "securityGroupIds": ws_settings.security_groups,
+    #     # "securityGroupIds": ws_settings.security_groups,
     # },
     tags=ws_settings.prd_tags,
     # Manage kubeconfig separately using an EksKubeconfig resource
@@ -146,6 +146,7 @@ prd_aws_resources = AwsResourceGroup(
     eks_cluster=prd_eks_cluster,
     eks_kubeconfig=prd_eks_kubeconfig,
     eks_nodegroups=[prd_services_eks_nodegroup, prd_worker_eks_nodegroup],
+    # Comment out to use custom subnets and security groups
     cloudformation_stacks=[prd_vpc_stack],
     # Uncomment to create ACM certificate
     # acm_certificates=[prd_acm_certificate],
