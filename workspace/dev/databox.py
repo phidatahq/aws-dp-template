@@ -2,9 +2,9 @@ from phidata.app.databox import Databox
 from phidata.docker.resource.image import DockerImage
 
 from workspace.dev.airflow.docker_resources import (
+    dev_airflow_env,
     dev_airflow_env_file,
     dev_airflow_secrets_file,
-    dev_airflow_env,
 )
 from workspace.dev.postgres import dev_postgres_airflow_connections
 from workspace.settings import ws_settings
