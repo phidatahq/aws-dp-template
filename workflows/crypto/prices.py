@@ -104,8 +104,18 @@ load_prices = load_crypto_prices()
 analyze_prices = analyze_crypto_prices()
 
 # Step 4: Create a Workflow to run these tasks
-crypto_prices_aws = Workflow(
+crypto_prices = Workflow(
     name="crypto_prices",
     tasks=[load_prices, analyze_prices],
     outputs=[crypto_prices_local],
+    # Airflow tasks created by this workflow are ordered using the graph param
+    # graph = { downstream: [upstream_list] }
+    # The downstream task will run after tasks in the upstream_list
+    # To run download_prices after drop_prices:
+    graph={
+        analyze_prices: [load_prices],
+    },
 )
+
+# Step 5: Create a DAG to run the workflow on a schedule
+dag = crypto_prices.create_airflow_dag()
