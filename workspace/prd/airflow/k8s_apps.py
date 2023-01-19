@@ -88,7 +88,7 @@ prd_airflow_env: Dict[str, str] = {
     "AIRFLOW__LOGGING__REMOTE_BASE_LOG_FOLDER": f"s3://{prd_logs_s3_bucket.name}/airflow",
     "AIRFLOW__LOGGING__REMOTE_LOG_CONN_ID": "aws_default",
     # Airflow Navbar color
-    "AIRFLOW__WEBSERVER__NAVBAR_COLOR": "#bbf7d0",
+    "AIRFLOW__WEBSERVER__NAVBAR_COLOR": "#d1fae5",
 }
 
 # -*- Database configuration
