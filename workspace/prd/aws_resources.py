@@ -44,17 +44,6 @@ prd_data_s3_bucket = S3Bucket(
     wait_for_deletion=wait_for_delete,
 )
 
-# -*- VPC stack for EKS
-prd_vpc_stack = CloudFormationStack(
-    name=f"{ws_settings.prd_key}-vpc",
-    template_url="https://amazon-eks.s3.us-west-2.amazonaws.com/cloudformation/2020-10-29/amazon-eks-vpc-private-subnets.yaml",
-    tags=ws_settings.prd_tags,
-    skip_create=skip_create,
-    skip_delete=skip_delete,
-    wait_for_creation=wait_for_create,
-    wait_for_deletion=wait_for_delete,
-)
-
 # -*- EKS settings
 # Node Group label for Services
 services_ng_label = {"app_type": "service"}
@@ -69,9 +58,8 @@ topology_spread_when_unsatisfiable = "DoNotSchedule"
 # -*- EKS cluster
 prd_eks_cluster = EksCluster(
     name=f"{ws_settings.prd_key}-cluster",
-    vpc_stack=prd_vpc_stack,
-    # To use custom subnets and security groups.
-    # Uncomment the line below and comment out the vpc_stack line below
+    # To use custom subnets and security groups:
+    #   Uncomment the resources_vpc_config and add subnets and security groups
     # resources_vpc_config={
     #     "subnetIds": ws_settings.subnet_ids,
     #     # "securityGroupIds": ws_settings.security_groups,
@@ -146,8 +134,6 @@ prd_aws_resources = AwsResourceGroup(
     eks_cluster=prd_eks_cluster,
     eks_kubeconfig=prd_eks_kubeconfig,
     eks_nodegroups=[prd_services_eks_nodegroup, prd_worker_eks_nodegroup],
-    # Comment out to use custom subnets and security groups
-    cloudformation_stacks=[prd_vpc_stack],
     # Uncomment to create ACM certificate
     # acm_certificates=[prd_acm_certificate],
 )
