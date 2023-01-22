@@ -111,7 +111,7 @@ crypto_prices = Workflow(
     # Airflow tasks created by this workflow are ordered using the graph param
     # graph = { downstream: [upstream_list] }
     # The downstream task will run after tasks in the upstream_list
-    # To run download_prices after drop_prices:
+    # Run analyze_prices after load_prices
     graph={
         analyze_prices: [load_prices],
     },
