@@ -1,6 +1,5 @@
 from phidata.aws.resource.group import (
     AcmCertificate,
-    CloudFormationStack,
     EksCluster,
     EksKubeconfig,
     EksNodeGroup,
