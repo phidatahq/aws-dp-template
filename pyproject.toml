@@ -20,8 +20,8 @@ dependencies = [
   "ruff",
   "phidata==1.1.1",
   # Dataframe libraries
-  # "pandas",
-  # "polars",
+  "pandas",
+  "polars",
   # Sql libraries
   # "sqlmodel",
   # Postgres libraries

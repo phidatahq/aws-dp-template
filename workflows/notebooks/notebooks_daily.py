@@ -28,9 +28,11 @@ with DAG(
     catchup=False,
 ) as dag:
 
-    hello_world = PapermillOperator(
-        task_id="hello_world",
-        input_nb=str(notebooks_dir.joinpath("examples", "hello_world.ipynb")),
-        output_nb="/tmp/hello_world_{{ execution_date }}.ipynb",
-        parameters={"msg": "Ran from Airflow at {{ execution_date }}!"},
+    crypto_nb = PapermillOperator(
+        task_id="crypto_nb",
+        input_nb=str(notebooks_dir.joinpath("examples", "crypto_nb.ipynb")),
+        # The output notebook will be saved to the outputs directory
+        # The outputs directory is ignored from git
+        output_nb=str(notebooks_dir.joinpath("outputs", "crypto_nb_{{ execution_date }}.ipynb")),
+        parameters={"run_date": "{{ execution_date }}"},
     )
